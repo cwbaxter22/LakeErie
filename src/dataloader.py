@@ -82,8 +82,9 @@ class DataLoader():
         """
         parameters = {}
         df = self.api_call(url=f"/api/v1/devices/{deviceId}/parameters?apiKey={apiKey}")
+
         for d in df["parameters"]: 
-            parameters[d["name"]] = d["id"]
+            parameters[d["name"]] = (d["id"], d["unit"])
         return parameters
 
 
@@ -167,7 +168,7 @@ def aggregate_data(test=False):
         parameters = dataLoader.get_device_parameters(deviceId=device_id)
 
         # Iterate through each parameter
-        for parameter_name, parameter_id in parameters.items():
+        for parameter_name, (parameter_id, parameter_units) in parameters.items():
             print("- parameter:", parameter_name)
             # Replace space with underscores in parameter_name
             parameter_name = parameter_name.replace(" ", "_")
@@ -196,6 +197,7 @@ def aggregate_data(test=False):
                 if (i == 10) and test: break
             
             # Save data for parameter to CSV
+            data["Units"] = parameter_units
             data.to_csv(os.path.join(device_directory,f"{parameter_name}.csv"), index=False)
 
         if test: break
