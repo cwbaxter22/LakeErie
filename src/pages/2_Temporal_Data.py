@@ -46,7 +46,7 @@ df_viz = df_intime.query(f"Location=='{LOCATION}'").query(f"variable=='{VARIABLE
 # Title of plot
 GRAPH_TITLE = f"{VARIABLE} over Time for {LOCATION}"
 #Create plot figure
-fig = px.line(df_viz, x = "Time", y = "value", title = GRAPH_TITLE, color = "Location", labels={"value": f"{VARIABLE}"})
+fig = px.scatter(df_viz, x = "Time", y = "value", title = GRAPH_TITLE, color = "Location", labels={"value": f"{VARIABLE}"})
 # Plot creation
 st.plotly_chart(fig)
 
