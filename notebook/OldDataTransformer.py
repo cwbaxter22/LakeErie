@@ -95,7 +95,7 @@ class OldDataTransformer():
             df = df.rename(columns={parameter_column: f"{column_name_parts[0][0]}"})
 
 
-            df.to_csv(f"../data/iChart6_data/raw/by_parameter/{device}_{column_name_parts[0][0]}_pivot.csv")
+            df.to_csv(f"../data/iChart6_data/raw/pivot/{device}/{column_name_parts[0][0]}_pivot.csv")
         except Exception as e:
             print(f"Error saving file '{device}_{parameter_id}.csv': {e}")
 

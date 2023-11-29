@@ -6,7 +6,7 @@ TODO:
 4) Save the data to /data/processed/<device_name>_<parameter_name>.csv?
 6) Add the units to the files.
 7) data interfacer class to deal with the frontend/backend
-
+git p
 """
 
 
@@ -84,6 +84,7 @@ class DataTransformer():
 
                     #merge the dataframes
                     if not merged_df.empty:
+                        df["Units"] = df["Units"].astype(str)
                         merged_df = pd.merge(merged_df, df, on = ["times", "Units"], how="outer")
                     else:
                         merged_df = df
