@@ -20,7 +20,8 @@ def df_creation(dir, frequency):
     # Checkboxes for user to select collection sites
     locations_selected = st.multiselect(
         "Data collection sites",
-        LOCATIONS
+        LOCATIONS,
+        default=LOCATIONS[0]
     )
     # List comprehension to create list of paths to needed dataframes
     df_dirs = [(dir + "/data/iChart6_data/processed/" + loc + frequency) for loc in locations_selected]
@@ -53,12 +54,12 @@ variables_in_df = list(df['parameter'].unique()) # List of all variable types
 
 with st.sidebar: # sidebar hides the drop-down
     st.subheader("Configure data selection")
-    START_DATE = st.date_input("Choose start-date", min_value=datetime.date(2008, 1, 1), max_value=datetime.date(2023, 9, 1), value = None)
-    END_DATE = st.date_input("Choose end-date", value = None)
+    START_DATE = st.date_input("Choose start-date", min_value=datetime.date(2000, 1, 1), max_value=datetime.date(2023, 9, 1), value = datetime.date(2000, 1, 1))
+    END_DATE = st.date_input("Choose end-date", value = datetime.date(2023, 9, 1))
 
-    LOCATION = st.selectbox(label = "Choose a location", options = locations_in_df)
+    #locations_to_graph = st.selectbox(label = "Choose a location", options = locations_in_df)
     #Figure out how to make this multiselect work
-    #LOCATION = st.multiselect('Choose desired locations', LOCATIONS)
+    locations_to_graph = st.multiselect('Choose desired locations', locations_in_df)
     VARIABLE = st.selectbox(label = "Choose a variable", options = variables_in_df)
 
 #Create temporary dataframe based on date range
@@ -66,14 +67,15 @@ mask = (df['times'] > np.datetime64(START_DATE)) & (df['times'] <= np.datetime64
 df_intime = df.loc[mask]
 
 # Configure temporary dataframe to queried values
-df_viz = df_intime.query(f"location=='{LOCATION}'").query(f"parameter=='{VARIABLE}'")
+df_viz = df_intime.query("location == @locations_to_graph").query(f"parameter=='{VARIABLE}'")
 
 # Title of plot
-GRAPH_TITLE = f"{VARIABLE} over Time for {LOCATION}"
+GRAPH_TITLE = f"{VARIABLE} over Time for {locations_to_graph}"
 #Create plot figure
 fig = px.scatter(df_viz, x = "times", y = "value_mean", title = GRAPH_TITLE, color = "location", labels={"value_mean": f"{VARIABLE}", "times" : "time"})
 # Plot creation
 st.plotly_chart(fig)
 
 #Display dataframe of plotted data
+st.write("Data from graph above")
 st.dataframe(df_viz)
