@@ -15,19 +15,30 @@ import numpy as np
 
 def df_creation(dir, frequency):
     st.subheader("Select data locations")
-    #Static list of data collection sites
-    LOCATIONS = ["Beach2_Buoy", "Beach2_Tower", "Beach6_Buoy", "TREC_Tower"]
+    # Static list of data collection sites
+    # Names of the csv files
+    LOCATIONS_UNFORMATTED = ["Beach2_Buoy", "Beach2_Tower", "Beach6_Buoy", "TREC_Tower"]
+    # Names of locations user can pick from
+    LOCATIONS_DISPLAY = ["Beach 2 Buoy", "Beach 2 Tower", "Beach 6 Buoy", "TREC Tower"]
     # Checkboxes for user to select collection sites
-    locations_selected = st.multiselect(
+    locations_selected_display = st.multiselect(
         "Data collection sites",
-        LOCATIONS,
-        default=LOCATIONS[0]
+        LOCATIONS_DISPLAY,
+        default=LOCATIONS_DISPLAY[-1],
     )
-    # List comprehension to create list of paths to needed dataframes
-    df_dirs = [(dir + "/data/iChart6_data/processed/" + loc + frequency) for loc in locations_selected]
-    # Concatenate all of the dfs into one
-    df_chosen_locs = pd.concat(map(pd.read_csv, df_dirs))
-    return df_chosen_locs
+    indices = [x in locations_selected_display for x in LOCATIONS_DISPLAY]
+    locations_selected_call = np.asarray(LOCATIONS_UNFORMATTED)[np.asarray(indices).astype(bool)]
+
+
+    if not locations_selected_call:
+        df_empty = pd.DataFrame()
+        return df_empty
+    else:
+        # List comprehension to create list of paths to needed dataframes
+        df_dirs = [(dir + "/data/iChart6_data/processed/" + loc + frequency) for loc in locations_selected_call]
+        # Concatenate all of the dfs into one
+        df_chosen_locs = pd.concat(map(pd.read_csv, df_dirs))
+        return df_chosen_locs
 
 
 dirname = os.path.dirname(__file__) #Relative path to /pages
@@ -38,7 +49,7 @@ st.title("Historical Buoy Data") # Page title
 frequency_selected = st.radio(
     "Select data interval",
     ["Hourly", "Daily"],
-    index=0
+    index=1
 )
 
 if frequency_selected == "Daily":
@@ -46,36 +57,46 @@ if frequency_selected == "Daily":
 else:
     df = df_creation(dirname, "/hourly_tidy_all_data.csv")
 
-#Convert time column to datetime
-df['times'] = pd.to_datetime(df['times'])
+if df.empty:
+    st.write(":red[Please select a data collection site from the drop-down above]" )
+else:
+    #Convert time column to datetime
+    df['times'] = pd.to_datetime(df['times'])
 
-locations_in_df = list(df['location'].unique()) # List of all weather station locations
-variables_in_df = list(df['parameter'].unique()) # List of all variable types
+    locations_in_df = list(df['location'].unique()) # List of all weather station locations
+    variables_in_df = list(df['parameter'].unique()) # List of all variable types
 
-with st.sidebar: # sidebar hides the drop-down
-    st.subheader("Configure data selection")
-    START_DATE = st.date_input("Choose start-date", min_value=datetime.date(2000, 1, 1), max_value=datetime.date(2023, 9, 1), value = datetime.date(2000, 1, 1))
-    END_DATE = st.date_input("Choose end-date", value = datetime.date(2023, 9, 1))
+    with st.sidebar: # sidebar hides the drop-down
+        st.subheader("Configure data selection")
+        START_DATE = st.date_input("Choose start-date", min_value=datetime.date(2000, 1, 1), max_value=datetime.date(2023, 9, 1), value = datetime.date(2000, 1, 1))
+        END_DATE = st.date_input("Choose end-date", value = datetime.date(2023, 9, 1))
 
-    #locations_to_graph = st.selectbox(label = "Choose a location", options = locations_in_df)
-    #Figure out how to make this multiselect work
-    locations_to_graph = st.multiselect('Choose desired locations', locations_in_df)
-    VARIABLE = st.selectbox(label = "Choose a variable", options = variables_in_df)
+        #locations_to_graph = st.selectbox(label = "Choose a location", options = locations_in_df)
+        #Figure out how to make this multiselect work
+        locations_to_graph = st.multiselect('Choose desired locations', locations_in_df, default=locations_in_df[0])
+        VARIABLE = st.selectbox(label = "Choose a variable", options = variables_in_df, index=0)
+    try:
+        #Create temporary dataframe based on date range
+        mask = (df['times'] > np.datetime64(START_DATE)) & (df['times'] <= np.datetime64(END_DATE))
+        df_intime = df.loc[mask]
 
-#Create temporary dataframe based on date range
-mask = (df['times'] > np.datetime64(START_DATE)) & (df['times'] <= np.datetime64(END_DATE))
-df_intime = df.loc[mask]
+        # Configure temporary dataframe to queried values
+        df_viz = df_intime.query("location == @locations_to_graph").query(f"parameter=='{VARIABLE}'")
+        
+        # Title of plot
+        GRAPH_TITLE = f"{VARIABLE} over Time for {locations_to_graph}"
+        #Create plot figure
+        fig = px.scatter(df_viz, x = "times", y = "value_mean", title = GRAPH_TITLE, color = "location", error_y = "value_std", labels={"value_mean": f"{VARIABLE} [{df_viz['Units'][0]}]", "times" : "Time"})
+        # Plot creation
+        st.plotly_chart(fig)
 
-# Configure temporary dataframe to queried values
-df_viz = df_intime.query("location == @locations_to_graph").query(f"parameter=='{VARIABLE}'")
-
-# Title of plot
-GRAPH_TITLE = f"{VARIABLE} over Time for {locations_to_graph}"
-#Create plot figure
-fig = px.scatter(df_viz, x = "times", y = "value_mean", title = GRAPH_TITLE, color = "location", labels={"value_mean": f"{VARIABLE}", "times" : "time"})
-# Plot creation
-st.plotly_chart(fig)
-
-#Display dataframe of plotted data
-st.write("Data from graph above")
-st.dataframe(df_viz)
+        #Display dataframe of plotted data
+        st.write("Data from graph above")
+        st.dataframe(df_viz, column_order=['location',
+                                           'parameter',
+                                           'value_mean',
+                                           'Units',
+                                           'value_std',
+                                           'times'])
+    except KeyError:
+        st.write(":red[Please fill in all configuration settings]")
