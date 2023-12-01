@@ -134,7 +134,7 @@ def get_times():
     return times
 
 
-def aggregate_data(test=False):
+def aggregate_data(test: bool = False): #, old: bool = False):
     """
     This function will: 
     1. Create a DataLoader object
@@ -148,9 +148,16 @@ def aggregate_data(test=False):
 
     # Get Devices for our project
     devices = dataLoader.get_devices()
+    print(devices)
+    return
 
     times = get_times()
     num_times = len(times)
+
+    # if old: 
+    #     apiKey = OLD_API_KEY
+    # else: 
+    #     apiKey = NEW_API_KEY
 
 
     # Iterate through each device
@@ -160,7 +167,7 @@ def aggregate_data(test=False):
         device_name = device_name.replace(" ", "_")
 
         # If doesn't already exist, create folder for device
-        device_directory = f"../data/raw/{device_name}"
+        device_directory = f"../../data/raw/{device_name}"
         if not os.path.exists(device_directory):
             os.mkdir(device_directory)
 
@@ -198,7 +205,7 @@ def aggregate_data(test=False):
             
             # Save data for parameter to CSV
             data["Units"] = parameter_units
-            data.to_csv(os.path.join(device_directory,f"{parameter_name}.csv"), index=False)
+            data.to_csv(os.path.join(device_directory, f"{parameter_name}.csv"), index=False)
 
         if test: break
 
