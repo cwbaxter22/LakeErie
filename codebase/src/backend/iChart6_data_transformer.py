@@ -41,8 +41,8 @@ class OldDataTransformer():
 
         #undo the comment below and comment out the line below that to get the devices from the API
         #self.devices = list(DataLoader.get_devices().keys())
-        #self.devices = ["TREC_Tower", "Beach6_Buoy", "Beach2_Tower", "Beach2_Buoy"]
-        self.devices = ["Beach2_Tower"]
+        self.devices = ["TREC_Tower", "Beach6_Buoy", "Beach2_Tower", "Beach2_Buoy"]
+        #self.devices = ["Beach2_Tower"]
 
     def parameter_aggregate(self, parameter: str) -> None:
         """
@@ -71,7 +71,7 @@ class OldDataTransformer():
         # the all_data.csv file.
         #####################################################################
 
-        for filename in os.listdir(f"../data/iChart6_data/raw/pivot/{device_name}"):
+        for filename in os.listdir(f"../../data/raw/ichart/pivot/{device_name}"):
 
             #iterate through all csv files
             if filename.endswith(".csv"):
@@ -81,7 +81,7 @@ class OldDataTransformer():
                 #########################################
                 #if "all_data" not in filename and "identifier" not in filename and "tidy" not in filename:
                 if all(keyword not in filename for keyword in ["all_data", "identifier", "tidy"]):
-                    df = pd.read_csv(os.path.join(f"../data/iChart6_data/raw/pivot/{device_name}", filename))
+                    df = pd.read_csv(os.path.join(f"../../data/raw/ichart/pivot/{device_name}", filename))
 
                     #merge the dataframes
                     if not merged_df.empty:
@@ -95,14 +95,14 @@ class OldDataTransformer():
                         merged_df = df
 
         # need to check to make sure the ../data/processed directory exists
-        if not os.path.exists("../data/iChart6_data/processed"):
-            os.makedirs("../data/iChart6_data/processed")
+        if not os.path.exists("../../data/processed/ichart"):
+            os.makedirs("../../data/processed/ichart")
 
         #need to check to make sure the ../data/processed/<device_name> directory exists
-        if not os.path.exists(os.path.join(f"../data/iChart6_data/processed/{device_name}")):  
-            os.makedirs(os.path.join(f"../data/iChart6_data/processed/{device_name}"))
+        if not os.path.exists(os.path.join(f"../../data/processed/ichart/{device_name}")):  
+            os.makedirs(os.path.join(f"../../data/processed/ichart/{device_name}"))
 
-        merged_df.to_csv(f"../data/iChart6_data/processed/{device_name}/all_data.csv", index=False)
+        merged_df.to_csv(f"../../data/processed/ichart/{device_name}/all_data.csv", index=False)
 
 
     def device_aggregate(self) -> None:
@@ -129,7 +129,7 @@ class OldDataTransformer():
         df["value"] = pd.to_numeric(df["value"], errors="coerce")
         df = df.dropna()
         df = df.sort_values(by = "times")
-        df.to_csv(f"../data/iChart6_data/processed/{device_name}/tidy_all_data.csv", index=False)
+        df.to_csv(f"../../data/processed/ichart/{device_name}/tidy_all_data.csv", index=False)
 
 
     def tidy_devices(self) -> None:
@@ -143,14 +143,14 @@ class OldDataTransformer():
         for device in self.devices:
             df = pd.DataFrame()
             #check to see if the all_data.csv file exists
-            if not os.path.exists(os.path.join(f"../data/iChart6_data/processed/{device}", "all_data.csv")):
+            if not os.path.exists(os.path.join(f"../../data/processed/ichart/{device}", "all_data.csv")):
                 #if it doesn't exist, then call the across_parameter_aggregate function
                 #to create it
                 self.across_parameter_aggregate(device)
 
             #if it does, then read it in and tidy it
             else:
-                df = pd.read_csv(os.path.join(f"../data/iChart6_data/processed/{device}", "all_data.csv"))
+                df = pd.read_csv(os.path.join(f"../../data/processed/ichart/{device}", "all_data.csv"))
                 self.tidy_data_transform(df, device)
 
 
@@ -179,7 +179,7 @@ class OldDataTransformer():
         hourly_df.columns = [col[0] if col[1] == '' else f"{col[0]}_{col[1]}" for col in hourly_df.columns]
         
         #save the data to a csv file
-        hourly_df.to_csv(f"../data/iChart6_data/processed/{device_name}/hourly_tidy_all_data.csv", index = False)
+        hourly_df.to_csv(f"../../data/processed/ichart/{device_name}/hourly_tidy_all_data.csv", index = False)
 
 
     def downsample_day(self, df: pd.DataFrame, device_name: str) -> None:
@@ -205,7 +205,7 @@ class OldDataTransformer():
         daily_df.columns = [col[0] if col[1] == '' else f"{col[0]}_{col[1]}" for col in daily_df.columns]
 
         #save the data to a csv file
-        daily_df.to_csv(f"../data/iChart6_data/processed/{device_name}/daily_tidy_all_data.csv", index = False)
+        daily_df.to_csv(f"../../data/processed/ichart/{device_name}/daily_tidy_all_data.csv", index = False)
 
     def device_downsample_hour(self) -> None:
         """
@@ -215,7 +215,7 @@ class OldDataTransformer():
         # need to check to make sure the processed tidy_all_data.csv files exist if not, call tidy_data_transform
 
         for device in self.devices:
-            df = pd.read_csv(f"../data/iChart6_data/processed/{device}/tidy_all_data.csv")
+            df = pd.read_csv(f"../../data/processed/ichart/{device}/tidy_all_data.csv")
             self.downsample_hour(df, device)
     
     
@@ -227,7 +227,7 @@ class OldDataTransformer():
 
         for device in self.devices:
             if device != "test_device":
-                df = pd.read_csv(f"../data/iChart6_data/processed/{device}/tidy_all_data.csv")
+                df = pd.read_csv(f"../../data/processed/ichart/{device}/tidy_all_data.csv")
                 self.downsample_day(df, device)
                 
 
@@ -244,7 +244,7 @@ class OldDataTransformer():
         return None
 
 olddataTransformer = OldDataTransformer()
-olddataTransformer.device_aggregate()
+#olddataTransformer.device_aggregate()
 olddataTransformer.tidy_devices()
 olddataTransformer.device_downsample_hour()
 olddataTransformer.device_downsample_day()

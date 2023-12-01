@@ -30,7 +30,7 @@ class DataLoader():
     2) Make a request to the API and handle errors
     3) Parse the reponse and return json (it will NOT clean or manipulate the data in any way - this will be done in the data cleaning class)
     """
-    def __init__(self, apiKey: str) -> None:
+    def __init__(self, apiKey: str, project: str) -> None:
         """
         Arguments: 
         ----------
@@ -49,6 +49,7 @@ class DataLoader():
         self.processed_device_parameters = defaultdict(list)
         self.processed_devices = []
         self.current_start_time = None
+        self.project = project
 
 
     def api_call(self, url: str) -> Dict:
@@ -184,7 +185,7 @@ def get_times():
     return times
 
 
-def aggregate_data(test: bool = False, old: bool = False):
+def aggregate_data(test: bool = False, old: bool = False, project: str = "new"):
     """
     This function will: 
     1. Create a DataLoader object
@@ -199,7 +200,7 @@ def aggregate_data(test: bool = False, old: bool = False):
         apiKey = NEW_API_KEY
 
     # Create Dataloader
-    dataLoader = DataLoader(apiKey=apiKey)
+    dataLoader = DataLoader(apiKey=apiKey, project=project)
     Done = False
 
     while not Done:
@@ -237,7 +238,7 @@ def ping_api(dataLoader, test: bool = False):
         print("Starting Device:", device_name)
 
         # If doesn't already exist, create folder for device
-        device_directory = f"../../data/raw/{device_name}"
+        device_directory = f"../../data/raw/{dataLoader.project}/{device_name}"
         if not os.path.exists(device_directory):
             os.mkdir(device_directory)
 
@@ -313,9 +314,9 @@ def ping_api(dataLoader, test: bool = False):
 TEST = True
 
 # Collect Old Data
-aggregate_data(test=TEST, old=True)
+aggregate_data(test=TEST, old=True, project="old")
 
 # Collect New Data
-# aggregate_data(test=TEST, old=False)
+# aggregate_data(test=TEST, old=False, project="new")
 
 
