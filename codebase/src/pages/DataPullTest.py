@@ -1,7 +1,8 @@
 import os
 import pandas as pd
 
-file = os.path.dirname(os.path.abspath(__file__))
+dirname = os.path.dirname(__file__)
 
-df = pd.read_csv(r"..\data\iChart6_data\processed\Beach2_Buoy_all_data.csv")
-#print(df.head())
+beach6hourly = os.path.join(dirname, "data/iChart6_data/processed/Beach6_Buoy/daily_tidy_all_data.csv")
+df = pd.read_csv(beach6hourly)
+print(df.head())
