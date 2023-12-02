@@ -151,6 +151,17 @@ class OldDataTransformer():
             #if it does, then read it in and tidy it
             else:
                 df = pd.read_csv(os.path.join(f"../../data/processed/ichart/{device}", "all_data.csv"))
+                
+
+                if "AirTemp" in df.columns:
+                    df = df.rename(columns={"AirTemp": "Air_Temperature"})
+
+                if "Temp" in df.columns:
+                    df = df.rename(columns={"Temp": "Water_Temperature"})
+                
+                if "ODO" in df.columns:
+                    df = df.rename(columns={"ODO": "Dissolved_Oxygen"})
+
                 self.tidy_data_transform(df, device)
 
 
@@ -244,7 +255,7 @@ class OldDataTransformer():
         return None
 
 olddataTransformer = OldDataTransformer()
-#olddataTransformer.device_aggregate()
+olddataTransformer.device_aggregate()
 olddataTransformer.tidy_devices()
 olddataTransformer.device_downsample_hour()
 olddataTransformer.device_downsample_day()

@@ -65,9 +65,6 @@ class DataLoader():
 
         return data
 
-    def save_state(self, state: Dict) -> None: 
-        self.state = state
-
     def find_errors(self, data: Dict) -> bool:
         if "message" in data.keys():
             if data["message"] == "Request exceeds hourly limit":

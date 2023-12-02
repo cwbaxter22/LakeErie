@@ -6,7 +6,6 @@ TODO:
 4) Save the data to /data/processed/<device_name>_<parameter_name>.csv?
 6) Add the units to the files.
 7) data interfacer class to deal with the frontend/backend
-git p
 """
 
 
@@ -97,6 +96,15 @@ class DataTransformer():
         if not os.path.exists(os.path.join(f"../data/processed/{device_name}")):  
             os.makedirs(os.path.join(f"../data/processed/{device_name}"))
 
+         if "AirTemp" in df.columns:
+            df = df.rename(columns={"AirTemp": "Air_Temperature"})
+
+        if "Temp" in df.columns:
+            df = df.rename(columns={"Temp": "Water_Temperature"})
+                
+        if "ODO" in df.columns:
+            df = df.rename(columns={"ODO": "Dissolved_Oxygen"})
+        
         merged_df.to_csv(f"../data/processed/{device_name}/all_data.csv", index=False)
 
 
