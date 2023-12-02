@@ -8,7 +8,6 @@ TODO:
 7) data interfacer class to deal with the frontend/backend
 """
 
-
 import os
 import pandas as pd
 #from dataloader import DataLoader
@@ -40,17 +39,19 @@ class DataTransformer():
 
         #undo the comment below and comment out the line below that to get the devices from the API
         #self.devices = list(DataLoader.get_devices().keys())
-        self.devices = ["TREC_Tower_iSIC"]
+        self.devices = ["Beach2_Tower_iSIC"]
+        self.raw_path = ""
+        self.processed_path = ""
+        self.project = ""
 
-    def parameter_aggregate(self, parameter: str) -> None:
+    def set_path(self, raw_path: str = "../../data/raw", processed_path: str = "../../data/processed") -> None:
         """
-        Potentially don't need this function depending on how we structure the data storage 
-        (i.e. if we have multiple csv files for each parameter).
+        This function sets the path for the raw and processed data.
         """
-        return None
+        self.raw_path = raw_path
+        self.processed_path = processed_path
 
-
-    def across_parameter_aggregate(self, device_name: str) -> None:
+    def across_parameter_aggregate(self, device_name: str, project: str) -> None:
 
         """
         Here is the first working function for merging all of the data from a single device 
@@ -69,7 +70,7 @@ class DataTransformer():
         # the all_data.csv file.
         #####################################################################
 
-        for filename in os.listdir(f"../data/raw/{device_name}"):
+        for filename in os.listdir(f"{self.raw_path}/{project}/{device_name}"):
 
             #iterate through all csv files
             if filename.endswith(".csv"):
@@ -77,9 +78,14 @@ class DataTransformer():
                 #########################################
                 # Eventually will take this out because we will save them to the processed directory
                 #########################################
-                #if "all_data" not in filename and "identifier" not in filename and "tidy" not in filename:
+                #if "all_data" not in filename and "identifier" not in filename and "tidy" 
+                # not in filename:
                 if all(keyword not in filename for keyword in ["all_data", "identifier", "tidy"]):
-                    df = pd.read_csv(os.path.join(f"../data/raw/{device_name}", filename))
+                    df = pd.read_csv(
+                        os.path.join(
+                            f"{self.raw_path}/{project}/{device_name}", filename
+                            )
+                            )
 
                     #merge the dataframes
                     if not merged_df.empty:
@@ -89,41 +95,42 @@ class DataTransformer():
                         merged_df = df
 
         # need to check to make sure the ../data/processed directory exists
-        if not os.path.exists("../data/processed"):
-            os.makedirs("../data/processed")
+        if not os.path.exists(f"{self.processed_path}"):
+            os.makedirs(f"{self.processed_path}")
+       
+        #need to check to make sure the ../data/processed/<project> directory exists
+        if not os.path.exists(f"{self.processed_path}/{project}"):
+            os.makedirs(f"{self.processed_path}/{project}")
 
-        #need to check to make sure the ../data/processed/<device_name> directory exists
-        if not os.path.exists(os.path.join(f"../data/processed/{device_name}")):  
-            os.makedirs(os.path.join(f"../data/processed/{device_name}"))
+        #need to check to make sure the ../data/processed/<project>/<device_name> directory exists
+        if not os.path.exists(os.path.join(f"{self.processed_path}/{project}/{device_name}")):  
+            os.makedirs(os.path.join(f"{self.processed_path}/{project}/{device_name}"))
 
-         if "AirTemp" in df.columns:
+        if "AirTemp" in df.columns:
             df = df.rename(columns={"AirTemp": "Air_Temperature"})
-
         if "Temp" in df.columns:
             df = df.rename(columns={"Temp": "Water_Temperature"})
-                
         if "ODO" in df.columns:
             df = df.rename(columns={"ODO": "Dissolved_Oxygen"})
-        
-        merged_df.to_csv(f"../data/processed/{device_name}/all_data.csv", index=False)
+        merged_df.to_csv(f"{self.processed_path}/{project}/{device_name}/all_data.csv", index=False)
 
 
-    def device_aggregate(self) -> None:
+    def device_aggregate(self, project: str) -> None:
         """
         Loops through all of the devices and calls across_parameter_aggregate on each device.
         """
-        for device in self.devices:               
-            self.across_parameter_aggregate(device)
+        for device in self.devices:            
+            self.across_parameter_aggregate(device, project)
 
 
-    def tidy_data_transform(self, df: pd.DataFrame, device_name: str) -> None:
+    def tidy_data_transform(self, df: pd.DataFrame, device_name: str, project: str) -> None:
         """
         This function takes in a dataframe and returns a tidy dataframe.
         Formated columns: times, Units, parameter, value
         TODO: 
         2) Go over this cleaning iteration
         """
-        #melts the dataframe into a tidy.format 
+        #melts the dataframe into a tidy.format
         df = df.melt(id_vars=["times", "Units"], var_name="parameter", value_name="value")
         #cleaning functions:
         #changing the times to pandas datetime format
@@ -132,32 +139,31 @@ class DataTransformer():
         df["value"] = pd.to_numeric(df["value"], errors="coerce")
         df = df.dropna()
         df = df.sort_values(by = "times")
-        df.to_csv(f"../data/processed/{device_name}/tidy_all_data.csv", index=False)
+        df.to_csv(f"{self.processed_path}/{project}/{device_name}/tidy_all_data.csv", index=False)
 
 
-    def tidy_devices(self) -> None:
+    def tidy_devices(self, project: str) -> None:
         """
         This function iterates through a list of devices 
         and creates tidy dataframes in the device directory.
         """
-        
         #check to see if the ../data/processed directory exists -- for a test
 
         for device in self.devices:
             df = pd.DataFrame()
-            #check to see if the all_data.csv file exists
-            if not os.path.exists(os.path.join(f"../data/processed/{device}", "all_data.csv")):
+            #check to see if the all_data.csv file exists from the processed directory
+            if not os.path.exists(os.path.join(f"{self.processed_path}/{project}/{device}", "all_data.csv")):
                 #if it doesn't exist, then call the across_parameter_aggregate function
-                #to create it
-                self.across_parameter_aggregate(device)
+                #to create it.
+                self.across_parameter_aggregate(device, project)
 
             #if it does, then read it in and tidy it
             else:
-                df = pd.read_csv(os.path.join(f"../data/processed/{device}", "all_data.csv"))
-                self.tidy_data_transform(df, device)
+                df = pd.read_csv(os.path.join(f"{self.processed_path}/{project}/{device}", "all_data.csv"))
+                self.tidy_data_transform(df, device, project)
 
 
-    def downsample_hour(self, df: pd.DataFrame, device_name: str) -> None:
+    def downsample_hour(self, df: pd.DataFrame, device_name: str, project: str) -> None:
         """
         This function will downsample the data to 1 hour intervals.
 
@@ -182,10 +188,10 @@ class DataTransformer():
         hourly_df.columns = [col[0] if col[1] == '' else f"{col[0]}_{col[1]}" for col in hourly_df.columns]
         
         #save the data to a csv file
-        hourly_df.to_csv(f"../data/processed/{device_name}/hourly_tidy_all_data.csv", index = False)
+        hourly_df.to_csv(f"{self.processed_path}/{project}/{device_name}/hourly_tidy_all_data.csv", index = False)
 
 
-    def downsample_day(self, df: pd.DataFrame, device_name: str) -> None:
+    def downsample_day(self, df: pd.DataFrame, device_name: str, project: str) -> None:
         """
         This function will downsample the data to 1 day intervals.
         TODO:
@@ -208,9 +214,9 @@ class DataTransformer():
         daily_df.columns = [col[0] if col[1] == '' else f"{col[0]}_{col[1]}" for col in daily_df.columns]
 
         #save the data to a csv file
-        daily_df.to_csv(f"../data/processed/{device_name}/daily_tidy_all_data.csv", index = False)
+        daily_df.to_csv(f"{self.processed_path}/{project}/{device_name}/daily_tidy_all_data.csv", index = False)
 
-    def device_downsample_hour(self) -> None:
+    def device_downsample_hour(self, project: str) -> None:
         """
         This function will call downsample_hour for all devices
         """
@@ -218,11 +224,11 @@ class DataTransformer():
         # need to check to make sure the processed tidy_all_data.csv files exist if not, call tidy_data_transform
 
         for device in self.devices:
-            df = pd.read_csv(f"../data/processed/{device}/tidy_all_data.csv")
-            self.downsample_hour(df, device)
+            df = pd.read_csv(f"{self.processed_path}/{project}/{device}/tidy_all_data.csv")
+            self.downsample_hour(df, device, project)
     
-    
-    def device_downsample_day(self) -> None:
+
+    def device_downsample_day(self, project: str) -> None:
         """
         This function will call downsample_day for all devices
         """
@@ -230,11 +236,30 @@ class DataTransformer():
 
         for device in self.devices:
             if device != "test_device":
-                df = pd.read_csv(f"../data/processed/{device}/tidy_all_data.csv")
-                self.downsample_day(df, device)
+                df = pd.read_csv(f"{self.processed_path}/{project}/{device}/tidy_all_data.csv")
+                self.downsample_day(df, device, project)
                 
 
+    def across_projects(self) -> None:
+        """
+        Run the above functions for the old and new projects
+        """
+        project = "old"
+        self.set_path()
+        self.device_aggregate(project)
+        self.tidy_devices(project)
+        self.device_downsample_hour(project)
+        self.device_downsample_day(project)
 
+        project = "new"
+        self.set_path()
+        self.device_aggregate(project)
+        self.tidy_devices(project)
+        self.device_downsample_hour(project)
+        self.device_downsample_day(project)
+
+
+        return None
 
     def clean_data(self) -> None:
         """
@@ -247,8 +272,9 @@ class DataTransformer():
         return None
 
 dataTransformer = DataTransformer()
-dataTransformer.device_aggregate()
-dataTransformer.tidy_devices()
-dataTransformer.device_downsample_hour()
-dataTransformer.device_downsample_day()
+dataTransformer.across_projects()
+#dataTransformer.device_aggregate()
+#dataTransformer.tidy_devices()
+#dataTransformer.device_downsample_hour()
+#dataTransformer.device_downsample_day()
 

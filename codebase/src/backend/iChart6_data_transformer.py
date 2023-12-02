@@ -44,13 +44,6 @@ class OldDataTransformer():
         self.devices = ["TREC_Tower", "Beach6_Buoy", "Beach2_Tower", "Beach2_Buoy"]
         #self.devices = ["Beach2_Tower"]
 
-    def parameter_aggregate(self, parameter: str) -> None:
-        """
-        Potentially don't need this function depending on how we structure the data storage 
-        (i.e. if we have multiple csv files for each parameter).
-        """
-        return None
-
 
     def across_parameter_aggregate(self, device_name: str) -> None:
 
