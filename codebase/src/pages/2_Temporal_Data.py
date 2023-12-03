@@ -14,6 +14,35 @@ import pandas as pd
 import plotly.express as px
 import numpy as np
 
+def create_all_time_fig(df_viz, graph_title, VARIABLE):
+    # Title of plot
+    graph_title = f"{VARIABLE} over Time for {locations_to_graph}"
+    #Create plot figure
+    all_time_fig = px.scatter(df_viz, x = "times",
+                        y = "value_mean",
+                        title = graph_title,
+                        color = "location",
+                        error_y = "value_std",
+                        labels={"value_mean": f"{VARIABLE} [{df_viz['Units'][0]}]",
+                                "times" : "Time"})
+    mask = (df['times'] > np.datetime64(START_DATE)) & (df['times'] <= np.datetime64(END_DATE))
+    df_intime = df.loc[mask]
+    # Configure temporary dataframe to queried values
+    df_viz = df_intime.query(
+        "location == @locations_to_graph").query(
+            f"parameter=='{VARIABLE}'")
+    # Title of plot
+    graph_title = f"{VARIABLE} over Time for {locations_to_graph}"
+    #Create plot figure
+    all_time_fig = px.scatter(df_viz, x = "times",
+                        y = "value_mean",
+                        title = graph_title,
+                        color = "location",
+                        error_y = "value_std",
+                        labels={"value_mean": f"{VARIABLE} [{df_viz['Units'][0]}]",
+                                "times" : "Time"})
+    return all_time_fig
+
 def df_creation(current_file_dir: str,
                  frequency: str) -> pd.DataFrame():
     """
@@ -63,40 +92,59 @@ def df_creation(current_file_dir: str,
         df_chosen_locs = pd.concat(map(pd.read_csv, df_dirs))
         return df_chosen_locs
     
-def annual_comparison(df):
-    on = st.toggle('Compute Annual Comparison')
-    if on:
-        variable = "AirTemp"
-        var_mask = df['parameter']==variable
-        df_spec_var = df.loc[var_mask]
-        #df_spec_var['times'] = np.datetime64(df_spec_var['times'])
-        df_spec_var['times'] = pd.to_datetime(df_spec_var['times'])
-        df_spec_var['month'] = pd.DatetimeIndex(df_spec_var['times']).month
-        df_spec_var['day'] = pd.DatetimeIndex(df_spec_var['times']).day
-        df_spec_var['year'] = pd.DatetimeIndex(df_spec_var['times']).year.astype(str)
-        #Example: df['ArrivalDate'].dt.year
-        #df_spec_var['month'] = df_spec_var['times'].datetime.month
-        #df_spec_var['day'] = df_spec_var['times'].datetime.day
-        #df_spec_var['year'] = df_spec_var['times'].datetime.year.astype(str)
-        try:
-            df_spec_var['hour'] = df_spec_var['times'].datetime.hour
-            df_spec_var['timepoint'] = df_spec_var['month'].astype(str) + '/' + df_spec_var['day'].astype(str) + " " + df_spec_var['hour']
-        except:
-            df_spec_var['timepoint'] = df_spec_var['month'].astype(str) + '/' + df_spec_var['day'].astype(str)
-        fig = px.scatter(df_spec_var, x = "timepoint",
+def annual_comparison(df, comparison_variable):
+    df['times'] = pd.to_datetime(df['times'])
+    df['year'] = pd.DatetimeIndex(df['times']).year.astype(str)
+    unique_years = df['year'].unique()
+    comparison_years = st.multiselect(
+    'Choose years to compare',
+    unique_years
+    )
+    var_mask = df['parameter']==comparison_variable
+    df_spec_var = df.loc[var_mask]
+    df_spec_var = df_spec_var[df_spec_var['year'].isin(comparison_years)]
+    #df_spec_var['times'] = pd.to_datetime(df_spec_var['times'])
+    df_spec_var['month'] = pd.DatetimeIndex(df_spec_var['times']).month
+    df_spec_var['day'] = pd.DatetimeIndex(df_spec_var['times']).day
+    #df_spec_var['year'] = pd.DatetimeIndex(df_spec_var['times']).year.astype(str)
+    try:
+        df_spec_var['hour'] = df_spec_var['times'].datetime.hour
+        df_spec_var['timepoint'] = df_spec_var['month'].astype(str) + '/' + df_spec_var['day'].astype(str) + " " + df_spec_var['hour']
+    except:
+        df_spec_var['timepoint'] = df_spec_var['month'].astype(str) + '/' + df_spec_var['day'].astype(str)
+    graph_title = f"{VARIABLE} annual data for {locations_to_graph}"
+    annual_fig = px.scatter(df_spec_var, x = "timepoint",
                             y = "value_mean",
-                            title = 'test',
+                            title = graph_title,
                             color = "year",
                             symbol = "year",
-                            #error_y = "value_std",
                             hover_data = ["year", "timepoint", "location", "value_std"],
-                            labels={"value_mean": f"{variable} [{df_spec_var['Units'][0]}]",
+                            #)
+                            labels={"value_mean": f"{comparison_variable} [{df_spec_var['Units'][0]}]",
                                     "timepoint" : "Month/Day"
                                     })
-        fig.update_traces(marker_size=5)
-        fig.update_layout(scattermode="group", scattergap=0.9)
-        st.plotly_chart(fig)
+    return annual_fig
 
+def plotIt(fig_to_plot):
+    px_width = st.slider('Plot width', min_value=500, max_value=2000, step=25)
+    px_height = st.slider('Plot height', min_value=500, max_value=2000, step=25)
+    fig_to_plot.update_traces(marker_size=5)
+    fig_to_plot.update_layout(scattermode="group", scattergap=0.9)
+    fig_to_plot.update_layout(
+    autosize=False,
+    width=px_width,
+    height=px_height,
+    )
+    # Plot creation
+    st.plotly_chart(fig_to_plot)
+    # Display dataframe of plotted data
+    st.dataframe(df_viz, column_order=['location',
+                                        'parameter',
+                                        'value_mean',
+                                        'Units',
+                                        'value_std',
+                                        'times'])
+    
 dirname = os.path.dirname(__file__) #Relative path to /pages
 st.set_page_config(layout="wide") # Page configuration must be first Streamlit command called
 st.title("Historical Buoy Data") # Page title
@@ -134,7 +182,6 @@ else:
         VARIABLE = st.selectbox(label = "Choose a variable",
                                 options = variables_in_df,
                                 index=0)
-    try:
         #Create temporary dataframe based on date range
         mask = (df['times'] > np.datetime64(START_DATE)) & (df['times'] <= np.datetime64(END_DATE))
         df_intime = df.loc[mask]
@@ -142,28 +189,18 @@ else:
         df_viz = df_intime.query(
             "location == @locations_to_graph").query(
                 f"parameter=='{VARIABLE}'")
-        # Title of plot
-        GRAPH_TITLE = f"{VARIABLE} over Time for {locations_to_graph}"
-        #Create plot figure
-        fig = px.scatter(df_viz, x = "times",
-                         y = "value_mean",
-                         title = GRAPH_TITLE,
-                         color = "location",
-                         error_y = "value_std",
-                         labels={"value_mean": f"{VARIABLE} [{df_viz['Units'][0]}]",
-                                 "times" : "Time"})
-        # Plot creation
-        st.plotly_chart(fig)
-        # Generate annual data overlap
-        print(pd.__version__)
-        annual_comparison(df_viz)
-        # Display dataframe of plotted data
-        st.write("Data from graph above")
-        st.dataframe(df_viz, column_order=['location',
-                                           'parameter',
-                                           'value_mean',
-                                           'Units',
-                                           'value_std',
-                                           'times'])
+    try:
+        data_comparison_type = st.radio(
+        "Choose graph type",
+        ["Chronological", "Annual Comparison"],
+        captions = ["View chronology of all variable data types selected from selected start to end date",
+                    "Superimpose annual plots of data type for years within selected range."])
+        if data_comparison_type == "Chronological":
+            fig = create_all_time_fig(df_viz, "Chronological Timeline", VARIABLE)
+            plotIt(fig)
+        else:
+            # Generate annual data overlap
+            an_fig = annual_comparison(df_viz, VARIABLE)
+            plotIt(an_fig)
     except:
         st.write(":red[Please fill in all configuration settings]")
