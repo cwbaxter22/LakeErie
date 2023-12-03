@@ -1,12 +1,3 @@
-"""
-TODO:
-1) write a data cleaning function
-2) add the other API key in the primary function, and write a function/loop to iterate through both
-   apikeys + their associated devices.
-4) Save the data to /data/processed/<device_name>_<parameter_name>.csv?
-6) Add the units to the files.
-7) data interfacer class to deal with the frontend/backend
-"""
 
 import os
 import pandas as pd
@@ -17,10 +8,13 @@ class DataTransformer():
     """
     This class can be used to aggregate and transform data from the user's computer. 
     This class is meant to be used in parallel with the DataLoader class.
-    1) It will aggregate data from multiple csv files into one csv file
-    2) It will transform the into a tidy format
-    3) It will clean the data
-    4) It will add units to the data (I think we should do this in the DataLoader class)
+    1) Specify the desrired path to the raw and processed data via set_path
+    2) Run across_projects to aggregate and transform data from the old and new projects
+        a) This function will call the following functions:
+            i) device_aggregate
+            ii) tidy_devices
+            iii) device_downsample_hour
+            iv) device_downsample_day
 
     """
 
@@ -44,9 +38,14 @@ class DataTransformer():
         self.processed_path = ""
         self.project = ""
 
-    def set_path(self, raw_path: str = "../../data/raw", processed_path: str = "../../data/processed") -> None:
+    def set_path(self,
+                 raw_path: str = "../../data/raw", 
+                 processed_path: str = "../../data/processed"
+                 ) -> None:
         """
         This function sets the path for the raw and processed data.
+        The defaults are set to the expected path for the data on the user's computer, 
+        given the user correctly downloaded/cloned the repository.
         """
         self.raw_path = raw_path
         self.processed_path = processed_path
@@ -54,9 +53,19 @@ class DataTransformer():
     def across_parameter_aggregate(self, device_name: str, project: str) -> None:
 
         """
-        Here is the first working function for merging all of the data from a single device 
-        into one csv file called "all_data.csv".
-        TODO:
+        Merges the data from multiple csv files into one csv file.
+
+        Arguments:
+        device_name (str): the name of the device that you want to aggregate data for.
+        project (str): the name of the project that you want to aggregate data for.
+
+        variable (type): description
+        
+        Returns:
+        No returns, but writes a csv file to the processed directory.
+        
+        Raises:
+        -------
 
         """
         #initialize two empty dataframes to manipulate and write data to later
@@ -75,9 +84,6 @@ class DataTransformer():
             #iterate through all csv files
             if filename.endswith(".csv"):
                 #these are the files that we don't want to merge into the all_data.csv file
-                #########################################
-                # Eventually will take this out because we will save them to the processed directory
-                #########################################
                 #if "all_data" not in filename and "identifier" not in filename and "tidy" 
                 # not in filename:
                 if all(keyword not in filename for keyword in ["all_data", "identifier", "tidy"]):
@@ -106,14 +112,16 @@ class DataTransformer():
         if not os.path.exists(os.path.join(f"{self.processed_path}/{project}/{device_name}")):  
             os.makedirs(os.path.join(f"{self.processed_path}/{project}/{device_name}"))
 
+        #standardize the column names across all data sets
         if "AirTemp" in df.columns:
             df = df.rename(columns={"AirTemp": "Air_Temperature"})
         if "Temp" in df.columns:
             df = df.rename(columns={"Temp": "Water_Temperature"})
         if "ODO" in df.columns:
             df = df.rename(columns={"ODO": "Dissolved_Oxygen"})
-        merged_df.to_csv(f"{self.processed_path}/{project}/{device_name}/all_data.csv", index=False)
 
+        #write the merged dataframe to a csv file
+        merged_df.to_csv(f"{self.processed_path}/{project}/{device_name}/all_data.csv", index=False)
 
     def device_aggregate(self, project: str) -> None:
         """
@@ -122,16 +130,29 @@ class DataTransformer():
         for device in self.devices:            
             self.across_parameter_aggregate(device, project)
 
-
     def tidy_data_transform(self, df: pd.DataFrame, device_name: str, project: str) -> None:
         """
-        This function takes in a dataframe and returns a tidy dataframe.
-        Formated columns: times, Units, parameter, value
-        TODO: 
-        2) Go over this cleaning iteration
+        Takes the all_data.csv file and transforms it into a tidy format.
+        To be run after the device_aggregate function.
+
+        Arguments:
+        df (pd.DataFrame): the dataframe (all_data.csv) that you want to transform into a tidy format.
+        device_name (str): the name of the device that you want to aggregate data for.
+
+        project (str): the name of the project that you want to aggregate data for.
+
+        variable (type): description
+        
+        Returns:
+        No returns, but writes a csv file to the processed directory.
+        
+        Raises:
+        -------
+
         """
         #melts the dataframe into a tidy.format
         df = df.melt(id_vars=["times", "Units"], var_name="parameter", value_name="value")
+        
         #cleaning functions:
         #changing the times to pandas datetime format
         df["times"] = pd.to_datetime(df["times"])
@@ -140,7 +161,6 @@ class DataTransformer():
         df = df.dropna()
         df = df.sort_values(by = "times")
         df.to_csv(f"{self.processed_path}/{project}/{device_name}/tidy_all_data.csv", index=False)
-
 
     def tidy_devices(self, project: str) -> None:
         """
@@ -162,10 +182,22 @@ class DataTransformer():
                 df = pd.read_csv(os.path.join(f"{self.processed_path}/{project}/{device}", "all_data.csv"))
                 self.tidy_data_transform(df, device, project)
 
-
     def downsample_hour(self, df: pd.DataFrame, device_name: str, project: str) -> None:
         """
         This function will downsample the data to 1 hour intervals.
+
+        Arguments:
+        df (pd.DataFrame): the dataframe (tidy_all_data.csv) that you want to aggregate data for.
+        device_name (str): the name of the device that you want to aggregate data for.
+        project (str): the name of the project that you want to aggregate data for.
+
+        
+        Returns:
+        No returns, but writes a csv file to the processed directory.
+        
+        Raises:
+        -------
+
 
         TODO:
         1) do we want standard error to the mean? or is std enough?
@@ -189,7 +221,6 @@ class DataTransformer():
         
         #save the data to a csv file
         hourly_df.to_csv(f"{self.processed_path}/{project}/{device_name}/hourly_tidy_all_data.csv", index = False)
-
 
     def downsample_day(self, df: pd.DataFrame, device_name: str, project: str) -> None:
         """
@@ -226,8 +257,7 @@ class DataTransformer():
         for device in self.devices:
             df = pd.read_csv(f"{self.processed_path}/{project}/{device}/tidy_all_data.csv")
             self.downsample_hour(df, device, project)
-    
-
+   
     def device_downsample_day(self, project: str) -> None:
         """
         This function will call downsample_day for all devices
@@ -237,44 +267,22 @@ class DataTransformer():
         for device in self.devices:
             if device != "test_device":
                 df = pd.read_csv(f"{self.processed_path}/{project}/{device}/tidy_all_data.csv")
-                self.downsample_day(df, device, project)
-                
+                self.downsample_day(df, device, project)             
 
-    def across_projects(self) -> None:
-        """
-        Run the above functions for the old and new projects
-        """
-        project = "old"
-        self.set_path()
-        self.device_aggregate(project)
-        self.tidy_devices(project)
-        self.device_downsample_hour(project)
-        self.device_downsample_day(project)
-
-        project = "new"
-        self.set_path()
-        self.device_aggregate(project)
-        self.tidy_devices(project)
-        self.device_downsample_hour(project)
-        self.device_downsample_day(project)
-
-
-        return None
-
-    def clean_data(self) -> None:
-        """
-        This function will clean the data.
-        I think this function should be called as early as possible
-        Remove NAN or replace with average?
-
-        """
-
-        return None
-
+    # def across_projects(self, project: string) -> None:
+    #     """
+    #     Run all data cleaning functions for a given project
+    #     """
+    #     self.set_path()
+    #     self.device_aggregate(project)
+    #     self.tidy_devices(project)
+    #     self.device_downsample_hour(project)
+    #     self.device_downsample_day(project)
+        
 dataTransformer = DataTransformer()
-dataTransformer.across_projects()
-#dataTransformer.device_aggregate()
-#dataTransformer.tidy_devices()
-#dataTransformer.device_downsample_hour()
-#dataTransformer.device_downsample_day()
+# dataTransformer.across_projects(project = "old")
+dataTransformer.device_aggregate(project = "old")
+dataTransformer.tidy_devices(project = "old")
+dataTransformer.device_downsample_hour(project = "old")
+dataTransformer.device_downsample_day(project = "old")
 
