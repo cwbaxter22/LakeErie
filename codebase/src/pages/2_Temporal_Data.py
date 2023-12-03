@@ -62,7 +62,40 @@ def df_creation(current_file_dir: str,
         # Concatenate all of the dfs into one
         df_chosen_locs = pd.concat(map(pd.read_csv, df_dirs))
         return df_chosen_locs
-
+    
+def annual_comparison(df):
+    on = st.toggle('Compute Annual Comparison')
+    if on:
+        variable = "AirTemp"
+        var_mask = df['parameter']==variable
+        df_spec_var = df.loc[var_mask]
+        #df_spec_var['times'] = np.datetime64(df_spec_var['times'])
+        df_spec_var['times'] = pd.to_datetime(df_spec_var['times'])
+        df_spec_var['month'] = pd.DatetimeIndex(df_spec_var['times']).month
+        df_spec_var['day'] = pd.DatetimeIndex(df_spec_var['times']).day
+        df_spec_var['year'] = pd.DatetimeIndex(df_spec_var['times']).year.astype(str)
+        #Example: df['ArrivalDate'].dt.year
+        #df_spec_var['month'] = df_spec_var['times'].datetime.month
+        #df_spec_var['day'] = df_spec_var['times'].datetime.day
+        #df_spec_var['year'] = df_spec_var['times'].datetime.year.astype(str)
+        try:
+            df_spec_var['hour'] = df_spec_var['times'].datetime.hour
+            df_spec_var['timepoint'] = df_spec_var['month'].astype(str) + '/' + df_spec_var['day'].astype(str) + " " + df_spec_var['hour']
+        except:
+            df_spec_var['timepoint'] = df_spec_var['month'].astype(str) + '/' + df_spec_var['day'].astype(str)
+        fig = px.scatter(df_spec_var, x = "timepoint",
+                            y = "value_mean",
+                            title = 'test',
+                            color = "year",
+                            symbol = "year",
+                            #error_y = "value_std",
+                            hover_data = ["year", "timepoint", "location", "value_std"],
+                            labels={"value_mean": f"{variable} [{df_spec_var['Units'][0]}]",
+                                    "timepoint" : "Month/Day"
+                                    })
+        fig.update_traces(marker_size=5)
+        fig.update_layout(scattermode="group", scattergap=0.9)
+        st.plotly_chart(fig)
 
 dirname = os.path.dirname(__file__) #Relative path to /pages
 st.set_page_config(layout="wide") # Page configuration must be first Streamlit command called
@@ -121,7 +154,10 @@ else:
                                  "times" : "Time"})
         # Plot creation
         st.plotly_chart(fig)
-        #Display dataframe of plotted data
+        # Generate annual data overlap
+        print(pd.__version__)
+        annual_comparison(df_viz)
+        # Display dataframe of plotted data
         st.write("Data from graph above")
         st.dataframe(df_viz, column_order=['location',
                                            'parameter',
@@ -129,5 +165,5 @@ else:
                                            'Units',
                                            'value_std',
                                            'times'])
-    except KeyError:
+    except:
         st.write(":red[Please fill in all configuration settings]")
