@@ -1,5 +1,7 @@
-import streamlit as st
 import base64
+import os
+import streamlit as st
+
 
 # https://discuss.streamlit.io/t/how-do-i-use-a-background-image-on-streamlit/5067
 # https://stackoverflow.com/questions/72582550/how-do-i-add-background-image-in-streamlit
@@ -22,7 +24,9 @@ st.set_page_config(
     page_title="Home",
     page_icon="👋"
 )
-set_background("PresqueIsle.jpg")
+home_path = os.path.dirname(__file__)
+background_image_path = home_path+'/PresqueIsle.jpg'
+set_background(background_image_path)
 st.sidebar.success("Menu")
 st.title("B-ware")
 st.markdown(
