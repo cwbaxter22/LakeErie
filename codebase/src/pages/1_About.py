@@ -1,3 +1,8 @@
+"""Simple module to provide brief overview of application
+
+Overview is written in markdown.
+Links to important sites are provided."""
+
 import streamlit as st
 st.title("About the application")
 st.markdown(
@@ -8,10 +13,10 @@ st.markdown(
     
     For current raw data, please visit [NextSens - WQDataLive](https://www.wqdatalive.com/)
 
-    For application source code, please visit [GitHub - LakeErie](https://github.com/Bware583/LakeErie)
+    For application source code, please visit /
+    [GitHub - LakeErie](https://github.com/Bware583/LakeErie)
     
     
     Created by Colin Baxter, Zac Espinosa, Ben Makhlouf, & Cole Morokhovich
     """
 )
-
