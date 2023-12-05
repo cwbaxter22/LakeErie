@@ -17,7 +17,8 @@ import numpy as np
 from collections import defaultdict
 
 from typing import Dict
-from config import OLD_API_KEY, NEW_API_KEY, PARAMETERS
+from config import OLD_API_KEY, NEW_API_KEY
+from config_combine import PARAMETERS
 
 start_year = 2014
 current_year = datetime.date.today().year # TODO: Change this to current year
