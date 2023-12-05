@@ -76,8 +76,8 @@ pexpect @ file:///tmp/build/80754af9/pexpect_1605563209008/work
 pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
 Pillow==10.1.0
 platformdirs @ file:///croot/platformdirs_1692205439124/work
-plotly==5.18.0
-plotly-express==0.4.1
+plotly
+plotly-express
 ply==3.11
 prometheus-client @ file:///tmp/abs_d3zeliano1/croots/recipe/prometheus_client_1659455100375/work
 prompt-toolkit @ file:///croot/prompt-toolkit_1672387306916/work
@@ -115,7 +115,7 @@ sniffio @ file:///home/builder/ci_310/sniffio_1640794799774/work
 soupsieve @ file:///croot/soupsieve_1696347547217/work
 stack-data @ file:///opt/conda/conda-bld/stack_data_1646927590127/work
 statsmodels==0.14.0
-streamlit==1.29.0
+streamlit
 tenacity==8.2.3
 terminado @ file:///croot/terminado_1671751832461/work
 tinycss2 @ file:///croot/tinycss2_1668168815555/work
