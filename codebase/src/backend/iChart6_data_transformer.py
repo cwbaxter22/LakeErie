@@ -43,6 +43,9 @@ class OldDataTransformer():
         #self.devices = list(DataLoader.get_devices().keys())
         self.devices = ["TREC_Tower", "Beach6_Buoy", "Beach2_Tower", "Beach2_Buoy"]
         #self.devices = ["Beach2_Tower"]
+        self.raw_path = ""
+        self.processed_path = ""
+        self.project = ""
 
 
     def across_parameter_aggregate(self, device_name: str) -> None:
@@ -221,8 +224,7 @@ class OldDataTransformer():
         for device in self.devices:
             df = pd.read_csv(f"../../data/processed/ichart/{device}/tidy_all_data.csv")
             self.downsample_hour(df, device)
-    
-    
+
     def device_downsample_day(self) -> None:
         """
         This function will call downsample_day for all devices
@@ -252,4 +254,3 @@ olddataTransformer.device_aggregate()
 olddataTransformer.tidy_devices()
 olddataTransformer.device_downsample_hour()
 olddataTransformer.device_downsample_day()
-

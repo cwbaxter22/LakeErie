@@ -1,7 +1,8 @@
 
 import os
 import pandas as pd
-#from dataloader import DataLoader
+
+#from data_loader import DataLoader
 
 
 class DataTransformer():
@@ -33,13 +34,13 @@ class DataTransformer():
 
         #undo the comment below and comment out the line below that to get the devices from the API
         #self.devices = list(DataLoader.get_devices().keys())
-        self.devices = ["Beach2_Tower_iSIC"]
+        self.devices = []
         self.raw_path = ""
         self.processed_path = ""
         self.project = ""
 
     def set_path(self,
-                 raw_path: str = "../../data/raw", 
+                 raw_path: str = "../../data/raw",
                  processed_path: str = "../../data/processed"
                  ) -> None:
         """
@@ -49,6 +50,10 @@ class DataTransformer():
         """
         self.raw_path = raw_path
         self.processed_path = processed_path
+
+    # need to add the default to get.devices from zac's code
+    def set_devices(self, devices: list) -> None:
+        self.devices = devices
 
     def across_parameter_aggregate(self, device_name: str, project: str) -> None:
 
@@ -80,19 +85,21 @@ class DataTransformer():
         #####################################################################
 
         for filename in os.listdir(f"{self.raw_path}/{project}/{device_name}"):
+            print(1)
 
             #iterate through all csv files
             if filename.endswith(".csv"):
                 #these are the files that we don't want to merge into the all_data.csv file
                 #if "all_data" not in filename and "identifier" not in filename and "tidy" 
                 # not in filename:
+                print(2)
                 if all(keyword not in filename for keyword in ["all_data", "identifier", "tidy"]):
                     df = pd.read_csv(
                         os.path.join(
                             f"{self.raw_path}/{project}/{device_name}", filename
                             )
                             )
-
+                    print(3)
                     #merge the dataframes
                     if not merged_df.empty:
                         df["Units"] = df["Units"].astype(str)
@@ -197,10 +204,6 @@ class DataTransformer():
         
         Raises:
         -------
-
-
-        TODO:
-        1) do we want standard error to the mean? or is std enough?
         """
         hourly_df = pd.DataFrame()
 
@@ -279,10 +282,13 @@ class DataTransformer():
     #     self.device_downsample_hour(project)
     #     self.device_downsample_day(project)
         
-dataTransformer = DataTransformer()
+# dataTransformer = DataTransformer()
+# dataTransformer.set_path("../../data/raw/ichart/pivot")
+# dataTransformer.set_devices(["Beach2_Tower", "Beach2_Buoy", "Beach6_Buoy", "TREC_Tower"])
+# dataTransformer.device_aggregate("ichart")
 # dataTransformer.across_projects(project = "old")
-dataTransformer.device_aggregate(project = "old")
-dataTransformer.tidy_devices(project = "old")
-dataTransformer.device_downsample_hour(project = "old")
-dataTransformer.device_downsample_day(project = "old")
+#dataTransformer.device_aggregate(project = "old")
+#dataTransformer.tidy_devices(project = "old")
+#dataTransformer.device_downsample_hour(project = "old")
+#dataTransformer.device_downsample_day(project = "old")
 
