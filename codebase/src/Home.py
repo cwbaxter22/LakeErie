@@ -59,16 +59,6 @@ st.set_page_config(
 # Create path to file
 home_path = os.path.dirname(__file__)
 # Merge path to file with image name
-background_image_path = home_path + '/PresqueIsle.jpg'
-set_background(background_image_path)
-home_path = os.path.dirname(__file__)
-background_image_path = home_path+'/PresqueIsle.jpg'
+background_image_path = home_path + '/Landing_page_draft.png'
 set_background(background_image_path)
 st.sidebar.success("Menu")
-st.title("B-ware")
-st.sidebar.success("Menu")
-st.markdown(
-    """
-        :green[Buoy-Water Analysis Reporting Environment]
-    """
-)
