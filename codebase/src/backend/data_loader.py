@@ -201,7 +201,9 @@ def aggregate_data(test: bool = False, old: bool = False, project: str = "new"):
     Done = False
 
     while not Done:
+        print("Starting new call")
         Done = ping_api(dataLoader, test=test)
+        print("Sleeping for 1 hour")
         time.sleep(3600)
 
 
@@ -278,7 +280,6 @@ def ping_api(dataLoader, test: bool = False):
 
                 if cur_data is None:
                     dataLoader.current_start_time = times[i]
-                    import pdb; pdb.set_trace()
                     return False
                 else: 
                     dataLoader.current_start_time = times[i+1]
@@ -296,6 +297,9 @@ def ping_api(dataLoader, test: bool = False):
                 # If testing mode, only get first 12 months
                 if (i == 12) and test: break
 
+            # Reset current_start_time to 0 for next parameter 
+            dataLoader.current_start_time = times[0]
+
             # Update processed_device_parameters because we have completed this parameter for this device
             dataLoader.processed_device_parameters[device_id].append(parameter_name)
 
@@ -305,15 +309,15 @@ def ping_api(dataLoader, test: bool = False):
         # If testing mode, only get first device
         if test: break
 
-    return False
+    return True
 
 # Change this to false when we're ready to actually run 
-TEST = True
+TEST = False
 
 # Collect Old Data
 aggregate_data(test=TEST, old=True, project="old")
 
 # Collect New Data
-# aggregate_data(test=TEST, old=False, project="new")
+aggregate_data(test=TEST, old=False, project="new")
 
 
