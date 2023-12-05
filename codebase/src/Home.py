@@ -1,6 +1,7 @@
 """Module that generates landing page for application
 
 This page is mainly an image."""
+
 import base64
 import os
 import streamlit as st
@@ -60,6 +61,11 @@ home_path = os.path.dirname(__file__)
 # Merge path to file with image name
 background_image_path = home_path + '/PresqueIsle.jpg'
 set_background(background_image_path)
+=======
+home_path = os.path.dirname(__file__)
+background_image_path = home_path+'/PresqueIsle.jpg'
+set_background(background_image_path)
+st.sidebar.success("Menu")
 st.title("B-ware")
 st.sidebar.success("Menu")
 st.markdown(
