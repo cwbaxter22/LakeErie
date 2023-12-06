@@ -1,4 +1,12 @@
+"""
+This file contains the class DataTransformer, which can be used to aggregate and transform data 
+from the user's computer. This class is meant to be used in parallel with the DataLoader class 
+and the data_transformer_runme.py file. It is meant to be as general as possible, so that it can
+work across any of the 3 projects (i.e. ichart, old, new), as well as any testing/simulation data.
 
+In an ideal world, this program gets run once per project. That way, all of the data is aggregated
+and can be stored on the users computer to run with the dashboard front end. 
+"""
 import os
 import pandas as pd
 
@@ -271,24 +279,4 @@ class DataTransformer():
             if device != "test_device":
                 df = pd.read_csv(f"{self.processed_path}/{project}/{device}/tidy_all_data.csv")
                 self.downsample_day(df, device, project)             
-
-    # def across_projects(self, project: string) -> None:
-    #     """
-    #     Run all data cleaning functions for a given project
-    #     """
-    #     self.set_path()
-    #     self.device_aggregate(project)
-    #     self.tidy_devices(project)
-    #     self.device_downsample_hour(project)
-    #     self.device_downsample_day(project)
-        
-# dataTransformer = DataTransformer()
-# dataTransformer.set_path("../../data/raw/ichart/pivot")
-# dataTransformer.set_devices(["Beach2_Tower", "Beach2_Buoy", "Beach6_Buoy", "TREC_Tower"])
-# dataTransformer.device_aggregate("ichart")
-# dataTransformer.across_projects(project = "old")
-#dataTransformer.device_aggregate(project = "old")
-#dataTransformer.tidy_devices(project = "old")
-#dataTransformer.device_downsample_hour(project = "old")
-#dataTransformer.device_downsample_day(project = "old")
 
