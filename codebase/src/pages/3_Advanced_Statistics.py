@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import pytimetk
 import plotly.io as pio
-
+import folium
 
 ####### Function to create dataframe #######
 
@@ -70,8 +70,144 @@ def create_trendline(data):
     
     return fig
 
+### function for anomaly calculation
+
+def create_anomaly_graph(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
+    """
+    Use pytimetk to plot a chosen variable over a selected time period, with statistical
+    analysis to produce anomaly bars and display values considered as anomalies.
+
+    Arguments:
+    - data (pandas.DataFrame): The input data containing the 'times' and 'value_mean' columns.
+    - times (datetime): The time column of the data.
+    - value_mean (float): The value column of the data.
+    - period (int): The period of the data, which is the rolling window for the anomaly detection. 
+        Default is 7.
+    - iqr_alpha (float): The alpha value for the interquartile range. 
+        Smaller IQR values will result in a lower threshold for detecting an anomaly. 
+        Default is 0.05.
+    - clean_alpha (float): The alpha value for the cleaning. 
+        Determines which values should be removed. 
+        A smaller clean_alpha will result in more points being completely removed from the dataset. 
+        Default is 0.75.
+
+    Returns:
+    - anomplot (plotly.graph_objects.Figure): Plotly figure object showing the chosen variable 
+        plotted over time, with anomaly bands and points considered as anomalies colored in red.
+
+    Raises:
+    - ValueError: If the 'times' or 'value_mean' column does not exist in the data.
+    - ValueError: If the 'times' column is not a datetime object.
+    - ValueError: If there is no data in either the 'times' or 'value_mean' column.
+    - ValueError: If there is a non-numeric value in the 'value_mean' column.
+    - ValueError: If the 'period' argument is negative or non-numeric.
+    - ValueError: If the 'iqr_alpha' argument is negative or non-numeric.
+    - ValueError: If the 'clean_alpha' argument is negative or non-numeric.
+
+    """
+
+    data_cleaned = data.dropna(subset=['value_mean'])
+
+    anomalize_df = pytimetk.anomalize(
+        data=data_cleaned,
+        date_column='times',
+        value_column='value_mean',
+        period=period,
+        iqr_alpha=iqr_alpha,
+        clean_alpha=clean_alpha,
+        clean="min_max"
+    )
+
+    anomplot = pytimetk.plot_anomalies(
+        data=anomalize_df,
+        date_column='times',
+        engine='plotly',
+        title='Plot Anomaly Bands'
+    )
+
+    return anomplot
 
 
+#### Create Leaflet map 
+def create_leaflet_map():
+    # Predefined station locations
+    stations = {
+        "TREQ Station": (42.109657, -80.155201),
+        "Bay Bouy": (42.126427, -80.145289),
+        "Beach 2 Tower": (42.151768, -80.132625),
+        "Beach 2 Bouy": (42.152811, -80.137925),
+        "Beach 6 Bouy": (42.157562, -80.131492),
+        "Nearshore Bouy": (42.170685, -80.123547),
+        "Walnut Creek Bouy": (42.103838, -80.256560),
+    }
+
+    # Extract latitudes and longitudes
+    latitudes, longitudes = zip(*stations.values())
+
+    # Create a folium map centered at the mean latitude and longitude of all stations
+    map_center = [sum(latitudes) / len(latitudes), sum(longitudes) / len(longitudes)]
+    m = folium.Map(location=map_center, zoom_start=10)
+
+    # Add markers for each station
+    for station, (lat, lon) in stations.items():
+        folium.Marker([lat, lon], popup=station).add_to(m)
+
+    return m
+
+# Example usage
+leaflet_map = create_leaflet_map()
+
+
+def anomaly_decomp(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
+    """
+    Create an anomaly graph with anomaly detection and plot.
+
+    Arguments:
+    - data (pandas.DataFrame): The input data containing the 'times' and 'value_mean' columns.
+    - times (str): The name of the time column in the data. Default is 'times'.
+    - value_mean (str): The name of the value column in the data. Default is 'value_mean'.
+    - period (int): The period of the data, which is the rolling window for the anomaly detection. 
+         Default is 7.
+    - iqr_alpha (float): The alpha value for the interquartile range. 
+        Smaller IQR values will result in a lower threshold for detecting an anomaly. 
+        Default is 0.05.
+    - clean_alpha (float): The alpha value for the cleaning. Determines which values should be removed. 
+        A smaller clean_alpha will result in more points being completely removed from the dataset. 
+        Default is 0.75.
+
+    Returns:
+    - plotly.graph_objects.Figure: The plot object representing the anomaly graph.
+
+    Raises:
+    - ValueError: If the 'times' or 'value_mean' column does not exist in the data.
+    - ValueError: If the 'times' column is not a string.
+    - ValueError: If the 'value_mean' column is not a string.
+    - ValueError: If the 'period' is not an integer.
+    - ValueError: If the 'iqr_alpha' is not a float.
+    - ValueError: If the 'clean_alpha' is not a float.
+
+    """
+   
+    data_cleaned = data.dropna(subset=['value_mean'])
+
+    anomalize_df = pytimetk.anomalize(
+        data=data_cleaned,
+        date_column='times',
+        value_column='value_mean',
+        period=period,
+        iqr_alpha=iqr_alpha,
+        clean_alpha=clean_alpha,
+        clean="min_max"
+    )
+
+    decomp = pytimetk.plot_anomalies_decomp(
+        data=anomalize_df,
+        date_column='times',
+        engine='plotly',
+        title='Seasonal Decomposition'
+    )
+
+    return decomp
 
 
 ###########################################################################################
@@ -80,7 +216,7 @@ def create_trendline(data):
 
 st.set_page_config(page_title="Advanced Statistics", layout="wide")
 st.title("Advanced Statistics")
-
+leaflet_map.save("map.html")
 file_path = "/Users/benjaminmakhlouf/Downloads/daily_tidy_all_data.csv"
 df = pd.read_csv(file_path)
 
@@ -97,7 +233,7 @@ selected_frequency = st.selectbox("Select data interval", ["Hourly", "Daily"], i
 # Drop down menu for the user to chose the selected parameter, stored in selected_parameter 
 selected_parameter = st.selectbox("Select Parameter", ["Air_Temperature", "Barometric_Pressure", "Daily_Rain"])
 
-#selected_parameter = "Air_Temperature"
+selected_parameter = "Air_Temperature"
 print(df)
 #create a new data frame that is the new selected parameter only 
 df_param = df[df['parameter'] == selected_parameter]
@@ -108,3 +244,14 @@ fig = create_trendline(df_param)
 
 #pio.show(fig)
 st.plotly_chart(fig)
+
+fig2 = create_anomaly_graph(df_param)
+
+st.plotly_chart(fig2)
+
+dec= anomaly_decomp(df_param)
+
+st.plotly_chart(dec)
+
+leaflet_map = create_leaflet_map()
+st.markdown(leaflet_map._repr_html_(), unsafe_allow_html=True)
