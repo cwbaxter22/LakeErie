@@ -1,62 +1,110 @@
-"""
-
-
-
+import os
 import streamlit as st
+import pandas as pd
+import numpy as np
+import pytimetk
+import plotly.io as pio
 
-from anomaly.py 
 
-st.set_page_config(layout="wide") # Page configuration must be first Streamlit command called
-st.title("Advanced Statistical Analysis") # Page title
+####### Function to create dataframe #######
 
-LOCATIONS = list(df['Location'].unique()) # List of all weather station locations
-VARIABLES = list(df['variable'].unique()) # List of all variable types
+def df_creation(current_file_dir: str, frequency: str, selected_location: str) -> pd.DataFrame:
+    """
+    Create dataframe using user-selected site.
 
-with st.sidebar: # sidebar hides the drop-down
-    st.subheader("Configure data selection")
-    START_DATE = st.date_input("Choose start-date", min_value=datetime.date(2021, 7, 21), max_value=datetime.date(2023, 8, 1), value = None)
-    END_DATE = st.date_input("Choose end-date", value = None)
+    Arguments:
+    ----------
+    current_file_dir (str): current file directory
+    frequency (str): frequency of data
+    selected_location (str): user-selected location
 
-    LOCATION = st.selectbox(label = "Choose a location", options = LOCATIONS)
-    #Figure out how to make this multiselect work
-    #LOCATION = st.multiselect('Choose desired locations', LOCATIONS)
-    VARIABLE = st.selectbox(label = "Choose a variable", options = VARIABLES)
-
-#Create temporary dataframe based on date range
-mask = (df['Time'] > np.datetime64(START_DATE)) & (df['Time'] <= np.datetime64(END_DATE))
-df_intime = df.loc[mask]
-
-# Configure temporary dataframe to queried values
-df_viz = df_intime.query(f"Location=='{LOCATION}'").query(f"variable=='{VARIABLE}'")
-
-# Call the trendline function to create the figure
-fig_trendline = trendline(df_viz)
-
-# Display the trendline figure in the Streamlit app
-st.plotly_chart(fig_trendline)
-
-# Add Word documentation below the trendline figure
-st.write("Time series data with trendline.")
-
-# Call the anomaly function to create the figure
-fig_anomaly = anomaly(df_viz)
-
-# Display the anomaly figure in the Streamlit app
-st.plotly_chart(fig_anomaly)
-
-# Add Word documentation below the anomaly figure
-st.write("Anomaly band display of chosen data.")
-
-# Create a button to display the deconstruction figure
-if st.button("Display Deconstruction"):
-    # Call the deconstruct function to create the figure
-    fig_deconstruction = deconstruct(df_viz)
-
-    # Display the deconstruction figure in the Streamlit app
-    st.plotly_chart(fig_deconstruction)
+    Returns:
+    ----------
+    df_chosen_loc (df): df containing user-selected location data
+    """
+    st.subheader("Select a data location")
+    # Static list of data collection sites
+    # Names of the csv files
+    LOCATIONS_UNFORMATTED = ["Beach2_Buoy", "Beach2_Tower", "Beach6_Buoy", "TREC_Tower"]
+    # Names of locations user can pick from
+    LOCATIONS_DISPLAY = ["Beach 2 Buoy", "Beach 2 Tower", "Beach 6 Buoy", "TREC Tower"]
     
+    # Allow the user to choose one location from the dropdown menu
+    selected_location = st.selectbox("Choose a data collection site", LOCATIONS_DISPLAY)
+    
+    # Index the array containing all of the available csv names using the selected location
+    location_index = LOCATIONS_DISPLAY.index(selected_location)
+    location_selected_call = LOCATIONS_UNFORMATTED[location_index]
+
+    # List comprehension to create a list of paths to needed dataframes
+    df_dir = current_file_dir + "/data/iChart6_data/processed/" + location_selected_call + frequency
+
+    # Read the selected location's dataframe
+    df_chosen_loc = pd.read_csv(df_dir)
+    return df_chosen_loc
+
+
+##### Function to create the time series trendline 
+def create_trendline(data):
+    """
+    Use pytimetk to create a non-linear trendline plot for the selected data
+
+    Arguments:
+    - data (pandas.DataFrame): The input data containing the 'times' and 'value_mean' columns of one variable.
+
+    Returns:
+    - fig (plotly.graph_objects.Figure): Plotly figure object showing the chosen variable over the selected time period, with a non-linear trendline.
+
+    Raises:
+    - ValueError: If the 'times' or 'value_mean' column does not exist in the data.
+    - ValueError: If the 'times' column is not a datetime object.
+    - ValueError: If there is no data in either the 'times' or 'value_mean' column.
+    - ValueError: If there is a non-numeric value in the 'value_mean' column.
     """
 
-import streamlit as st
+    fig = pytimetk.plot_timeseries(
+        data=data,
+        date_column='times',
+        value_column='value_mean'
+    )
+    
+    return fig
 
-st.markdown("hello world")
+
+
+
+
+###########################################################################################
+######### Streamlit #######################################################################
+########################################################################################### 
+
+st.set_page_config(page_title="Advanced Statistics", layout="wide")
+st.title("Advanced Statistics")
+
+file_path = "/Users/benjaminmakhlouf/Downloads/daily_tidy_all_data.csv"
+df = pd.read_csv(file_path)
+
+# Relative path to /pages
+#dirname = os.path.dirname(__file__)
+#df = df_creation(dirname, "/daily_tidy_all_data.csv", selected_location="")
+
+df['times'] = pd.to_datetime(df['times']) #make sure times in the datetime
+df['value_mean'] = pd.to_numeric(df['value_mean']) #make sure value_mean is numeric
+
+
+# Drop down menu for the user to choose the selected frequency, stored in selected_frequency
+selected_frequency = st.selectbox("Select data interval", ["Hourly", "Daily"], index=1)
+# Drop down menu for the user to chose the selected parameter, stored in selected_parameter 
+selected_parameter = st.selectbox("Select Parameter", ["Air_Temperature", "Barometric_Pressure", "Daily_Rain"])
+
+#selected_parameter = "Air_Temperature"
+print(df)
+#create a new data frame that is the new selected parameter only 
+df_param = df[df['parameter'] == selected_parameter]
+
+print(df_param)
+#Call the create_trendline function to create the trendline figure 
+fig = create_trendline(df_param)
+
+#pio.show(fig)
+st.plotly_chart(fig)
