@@ -1,4 +1,10 @@
+"""
+
+
+
 import streamlit as st
+
+from anomaly.py 
 
 st.set_page_config(layout="wide") # Page configuration must be first Streamlit command called
 st.title("Advanced Statistical Analysis") # Page title
@@ -49,3 +55,8 @@ if st.button("Display Deconstruction"):
     # Display the deconstruction figure in the Streamlit app
     st.plotly_chart(fig_deconstruction)
     
+    """
+
+import streamlit as st
+
+st.markdown("hello world")
