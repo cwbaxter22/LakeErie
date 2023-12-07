@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_41a66cd82b9d072e402c63e09e6d3317 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_41a66cd82b9d072e402c63e09e6d3317" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_41a66cd82b9d072e402c63e09e6d3317 = L.map(
+                "map_41a66cd82b9d072e402c63e09e6d3317",
+                {
+                    center: [42.138963999999994, -80.15466271428572],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 10,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_ab69c6079ee6eb892983525a6938114a = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_41a66cd82b9d072e402c63e09e6d3317);
+        
+    
+            var marker_455b2486ad54a0f9ceafa50c8bb3a322 = L.marker(
+                [42.109657, -80.155201],
+                {}
+            ).addTo(map_41a66cd82b9d072e402c63e09e6d3317);
+        
+    
+        var popup_ba62ff8b7fe9cd8df5d64a92f824ef70 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_3cfd8ce49f47ab90dc5ec4eea665bfa0 = $(`<div id="html_3cfd8ce49f47ab90dc5ec4eea665bfa0" style="width: 100.0%; height: 100.0%;">TREQ Station</div>`)[0];
+                popup_ba62ff8b7fe9cd8df5d64a92f824ef70.setContent(html_3cfd8ce49f47ab90dc5ec4eea665bfa0);
+            
+        
+
+        marker_455b2486ad54a0f9ceafa50c8bb3a322.bindPopup(popup_ba62ff8b7fe9cd8df5d64a92f824ef70)
+        ;
+
+        
+    
+    
+            var marker_d3ae8e18377893938623b3b3508fe66e = L.marker(
+                [42.126427, -80.145289],
+                {}
+            ).addTo(map_41a66cd82b9d072e402c63e09e6d3317);
+        
+    
+        var popup_15a8bf5494d1f67677fb9c7d745bf400 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_50273368e418dc43ee10924623799c8d = $(`<div id="html_50273368e418dc43ee10924623799c8d" style="width: 100.0%; height: 100.0%;">Bay Bouy</div>`)[0];
+                popup_15a8bf5494d1f67677fb9c7d745bf400.setContent(html_50273368e418dc43ee10924623799c8d);
+            
+        
+
+        marker_d3ae8e18377893938623b3b3508fe66e.bindPopup(popup_15a8bf5494d1f67677fb9c7d745bf400)
+        ;
+
+        
+    
+    
+            var marker_405be967dc3c9ddbd1b47346f989e393 = L.marker(
+                [42.151768, -80.132625],
+                {}
+            ).addTo(map_41a66cd82b9d072e402c63e09e6d3317);
+        
+    
+        var popup_e4f185927a761cf2326f63e705d5ab33 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_513203c86d5711c67813f25e1c68c8c3 = $(`<div id="html_513203c86d5711c67813f25e1c68c8c3" style="width: 100.0%; height: 100.0%;">Beach 2 Tower</div>`)[0];
+                popup_e4f185927a761cf2326f63e705d5ab33.setContent(html_513203c86d5711c67813f25e1c68c8c3);
+            
+        
+
+        marker_405be967dc3c9ddbd1b47346f989e393.bindPopup(popup_e4f185927a761cf2326f63e705d5ab33)
+        ;
+
+        
+    
+    
+            var marker_23a803f3005076db52c5181bbd21a1dd = L.marker(
+                [42.152811, -80.137925],
+                {}
+            ).addTo(map_41a66cd82b9d072e402c63e09e6d3317);
+        
+    
+        var popup_bdd67e49e0d4b40d63b027b2a2c2a534 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_c5f6080ede5412eab2e51f1145200e2a = $(`<div id="html_c5f6080ede5412eab2e51f1145200e2a" style="width: 100.0%; height: 100.0%;">Beach 2 Bouy</div>`)[0];
+                popup_bdd67e49e0d4b40d63b027b2a2c2a534.setContent(html_c5f6080ede5412eab2e51f1145200e2a);
+            
+        
+
+        marker_23a803f3005076db52c5181bbd21a1dd.bindPopup(popup_bdd67e49e0d4b40d63b027b2a2c2a534)
+        ;
+
+        
+    
+    
+            var marker_b113fbaab72021417e9053eb11134b71 = L.marker(
+                [42.157562, -80.131492],
+                {}
+            ).addTo(map_41a66cd82b9d072e402c63e09e6d3317);
+        
+    
+        var popup_201b02a0d3608ce74ddc695aaae4f519 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_6034911a095d6b0472a2db1d5caceb86 = $(`<div id="html_6034911a095d6b0472a2db1d5caceb86" style="width: 100.0%; height: 100.0%;">Beach 6 Bouy</div>`)[0];
+                popup_201b02a0d3608ce74ddc695aaae4f519.setContent(html_6034911a095d6b0472a2db1d5caceb86);
+            
+        
+
+        marker_b113fbaab72021417e9053eb11134b71.bindPopup(popup_201b02a0d3608ce74ddc695aaae4f519)
+        ;
+
+        
+    
+    
+            var marker_7a884f38f98faaa56034e949423a8b2b = L.marker(
+                [42.170685, -80.123547],
+                {}
+            ).addTo(map_41a66cd82b9d072e402c63e09e6d3317);
+        
+    
+        var popup_176a7ac0183a6bc895901c20c1c2fad9 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_49b8a8e829dbe041748f3d0c517d370b = $(`<div id="html_49b8a8e829dbe041748f3d0c517d370b" style="width: 100.0%; height: 100.0%;">Nearshore Bouy</div>`)[0];
+                popup_176a7ac0183a6bc895901c20c1c2fad9.setContent(html_49b8a8e829dbe041748f3d0c517d370b);
+            
+        
+
+        marker_7a884f38f98faaa56034e949423a8b2b.bindPopup(popup_176a7ac0183a6bc895901c20c1c2fad9)
+        ;
+
+        
+    
+    
+            var marker_ea11e8daf8174daf7936979d49956b50 = L.marker(
+                [42.103838, -80.25656],
+                {}
+            ).addTo(map_41a66cd82b9d072e402c63e09e6d3317);
+        
+    
+        var popup_33a5162603e6638d31095e9f91b7c1cb = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_029d58bd356610580c4f43992976b597 = $(`<div id="html_029d58bd356610580c4f43992976b597" style="width: 100.0%; height: 100.0%;">Walnut Creek Bouy</div>`)[0];
+                popup_33a5162603e6638d31095e9f91b7c1cb.setContent(html_029d58bd356610580c4f43992976b597);
+            
+        
+
+        marker_ea11e8daf8174daf7936979d49956b50.bindPopup(popup_33a5162603e6638d31095e9f91b7c1cb)
+        ;
+
+        
+    
+</script>
+</html>
