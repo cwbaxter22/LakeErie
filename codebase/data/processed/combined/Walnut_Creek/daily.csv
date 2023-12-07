@@ -1768,8 +1768,6 @@ times,Units,value_mean,value_std,parameter,location
 2022-05-01,F,,,Air_Temperature,Walnut_Creek
 2022-05-02,F,,,Air_Temperature,Walnut_Creek
 2022-05-03,F,,,Air_Temperature,Walnut_Creek
-2022-05-04,F,-100000.0,0.0,Air_Temperature,Walnut_Creek
-2022-05-05,F,-100000.0,0.0,Air_Temperature,Walnut_Creek
 2022-05-06,F,,,Air_Temperature,Walnut_Creek
 2022-05-07,F,,,Air_Temperature,Walnut_Creek
 2022-05-08,F,,,Air_Temperature,Walnut_Creek
@@ -2132,13 +2130,6 @@ times,Units,value_mean,value_std,parameter,location
 2023-04-30,F,,,Air_Temperature,Walnut_Creek
 2023-05-01,F,,,Air_Temperature,Walnut_Creek
 2023-05-02,F,,,Air_Temperature,Walnut_Creek
-2023-05-03,F,-100000.0,0.0,Air_Temperature,Walnut_Creek
-2023-05-04,F,-100000.0,0.0,Air_Temperature,Walnut_Creek
-2023-05-05,F,-100000.0,0.0,Air_Temperature,Walnut_Creek
-2023-05-06,F,-100000.0,0.0,Air_Temperature,Walnut_Creek
-2023-05-07,F,-100000.0,0.0,Air_Temperature,Walnut_Creek
-2023-05-08,F,-100000.0,0.0,Air_Temperature,Walnut_Creek
-2023-05-09,F,-92151.98823529412,26939.38567071812,Air_Temperature,Walnut_Creek
 2023-05-10,F,54.806,1.6856138262638578,Air_Temperature,Walnut_Creek
 2023-05-11,F,55.1225,3.025260795816408,Air_Temperature,Walnut_Creek
 2023-05-12,F,58.822500000000005,3.035461340014022,Air_Temperature,Walnut_Creek
