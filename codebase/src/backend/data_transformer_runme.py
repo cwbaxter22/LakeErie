@@ -68,18 +68,27 @@ class DataWrangler:
         """
         for project in self.project:
             for device in os.listdir(f"../../data/raw/{project}"):
-                if device == "TREC_Tower_iSIC":
+                # if device == "TREC_Tower_iSIC":
+                #     continue
+                # if device == "Beach2_Tower_iSIC":
+                #     continue
+                if device not in ["TREC_Tower_iSIC"]: #, "Beach2_Tower_iSIC"]:
                     continue
-                if device == "Beach2_Tower_iSIC":
-                    continue
+
                 for filename in os.listdir(f"../../data/raw/{project}/{device}"):
                     print(device, filename)
                     if filename.endswith(".csv"):
                         df = pd.read_csv(f"../../data/raw/{project}/{device}/{filename}")
+                        df = df[df["times"] != "times"]
+                        df.drop_duplicates(subset=['times'], inplace=True)
+                        df.dropna(subset=['times'], inplace=True)
+                        df.reset_index(inplace=True)
                         df["times"] = pd.to_datetime(df["times"])
+                        df.drop(columns=["index"], inplace=True)
                         parameter = df.columns[1]
                         df.rename(columns={parameter: 'value'}, inplace=True)
                         df.set_index("times", inplace=True)
+                        df["value"] = df["value"].astype(float)
                         hourly_df = df.groupby(["Units"]).resample('H').agg({"value": ["mean", "std"]})
                         daily_df = df.groupby(["Units"]).resample('D').agg({"value": ["mean", "std"]})
                         hourly_df.reset_index(inplace=True)
