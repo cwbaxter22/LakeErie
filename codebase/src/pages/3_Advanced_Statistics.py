@@ -5,6 +5,7 @@ import numpy as np
 import pytimetk
 import plotly.io as pio
 import folium
+from streamlit_folium import folium_static
 
 ####### Function to create dataframe #######
 
@@ -127,9 +128,7 @@ def create_anomaly_graph(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
 
     return anomplot
 
-
-#### Create Leaflet map 
-def create_leaflet_map():
+def create_leaflet_map(selected_location):
     # Predefined station locations
     stations = {
         "TREQ Station": (42.109657, -80.155201),
@@ -141,21 +140,18 @@ def create_leaflet_map():
         "Walnut Creek Bouy": (42.103838, -80.256560),
     }
 
-    # Extract latitudes and longitudes
     latitudes, longitudes = zip(*stations.values())
-
-    # Create a folium map centered at the mean latitude and longitude of all stations
     map_center = [sum(latitudes) / len(latitudes), sum(longitudes) / len(longitudes)]
-    m = folium.Map(location=map_center, zoom_start=10)
 
-    # Add markers for each station
+    # Create a Folium map with 'cartodbdark_matter' tile layer
+    m = folium.Map(location=map_center, zoom_start=10, tiles='cartodbdark_matter')
+
     for station, (lat, lon) in stations.items():
-        folium.Marker([lat, lon], popup=station).add_to(m)
+        icon_color = 'red' if station == selected_location else 'grey'
+        folium.Marker([lat, lon], popup=station, icon=folium.Icon(color=icon_color)).add_to(m)
 
     return m
 
-# Example usage
-leaflet_map = create_leaflet_map()
 
 
 def anomaly_decomp(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
@@ -213,45 +209,47 @@ def anomaly_decomp(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
 ###########################################################################################
 ######### Streamlit #######################################################################
 ########################################################################################### 
+###########################################################################################
+######### Streamlit #######################################################################
+########################################################################################### 
 
 st.set_page_config(page_title="Advanced Statistics", layout="wide")
 st.title("Advanced Statistics")
-leaflet_map.save("map.html")
+
+# Drop down menu for location
+selected_location = st.selectbox("Select Location", ["TREQ Station", "Bay Bouy", "Beach 2 Tower", "Beach 2 Bouy", "Beach 6 Bouy", "Nearshore Bouy", "Walnut Creek Bouy"])
+
+# Call your function to create the Leaflet map
+leaflet_map = create_leaflet_map(selected_location)
+
+# Display the Leaflet map using st.markdown
+st.markdown(folium_static(leaflet_map), unsafe_allow_html=True)
+
 file_path = "/Users/benjaminmakhlouf/Downloads/daily_tidy_all_data.csv"
 df = pd.read_csv(file_path)
 
-# Relative path to /pages
-#dirname = os.path.dirname(__file__)
-#df = df_creation(dirname, "/daily_tidy_all_data.csv", selected_location="")
+df['times'] = pd.to_datetime(df['times'])  # make sure times are in datetime
+df['value_mean'] = pd.to_numeric(df['value_mean'])  # make sure value_mean is numeric
 
-df['times'] = pd.to_datetime(df['times']) #make sure times in the datetime
-df['value_mean'] = pd.to_numeric(df['value_mean']) #make sure value_mean is numeric
-
-
-# Drop down menu for the user to choose the selected frequency, stored in selected_frequency
-selected_frequency = st.selectbox("Select data interval", ["Hourly", "Daily"], index=1)
-# Drop down menu for the user to chose the selected parameter, stored in selected_parameter 
+# Drop down menu for the user to choose the selected parameter, stored in selected_parameter 
 selected_parameter = st.selectbox("Select Parameter", ["Air_Temperature", "Barometric_Pressure", "Daily_Rain"])
 
 selected_parameter = "Air_Temperature"
 print(df)
-#create a new data frame that is the new selected parameter only 
+# create a new data frame that is the new selected parameter only 
 df_param = df[df['parameter'] == selected_parameter]
 
 print(df_param)
-#Call the create_trendline function to create the trendline figure 
+# Call the create_trendline function to create the trendline figure 
 fig = create_trendline(df_param)
 
-#pio.show(fig)
+# pio.show(fig)
 st.plotly_chart(fig)
 
 fig2 = create_anomaly_graph(df_param)
 
 st.plotly_chart(fig2)
 
-dec= anomaly_decomp(df_param)
+dec = anomaly_decomp(df_param)
 
 st.plotly_chart(dec)
-
-leaflet_map = create_leaflet_map()
-st.markdown(leaflet_map._repr_html_(), unsafe_allow_html=True)
