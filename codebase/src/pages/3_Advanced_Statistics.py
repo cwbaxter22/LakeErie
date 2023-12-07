@@ -7,6 +7,12 @@ import plotly.io as pio
 import folium
 from streamlit_folium import folium_static
 
+
+#################################
+###### FUNCTIONS
+# ############################### 
+
+
 ####### Function to create dataframe #######
 
 def df_creation(current_file_dir: str, frequency: str, selected_location: str) -> pd.DataFrame:
@@ -46,6 +52,7 @@ def df_creation(current_file_dir: str, frequency: str, selected_location: str) -
 
 
 ##### Function to create the time series trendline 
+
 def create_trendline(data):
     """
     Use pytimetk to create a non-linear trendline plot for the selected data
@@ -128,6 +135,9 @@ def create_anomaly_graph(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
 
     return anomplot
 
+
+#### Function to create the leaflet map 
+
 def create_leaflet_map(selected_location):
     # Predefined station locations
     stations = {
@@ -153,6 +163,7 @@ def create_leaflet_map(selected_location):
     return m
 
 
+### Function for the statistical decomposition 
 
 def anomaly_decomp(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
     """
@@ -209,12 +220,10 @@ def anomaly_decomp(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
 ###########################################################################################
 ######### Streamlit #######################################################################
 ########################################################################################### 
-###########################################################################################
-######### Streamlit #######################################################################
-########################################################################################### 
 
+## Configure the page 
 st.set_page_config(page_title="Advanced Statistics", layout="wide")
-st.title("Advanced Statistics")
+st.title("Advanced Statistics") # Title for the streamlit app 
 
 # Drop down menu for location
 selected_location = st.selectbox("Select Location", ["TREQ Station", "Bay Bouy", "Beach 2 Tower", "Beach 2 Bouy", "Beach 6 Bouy", "Nearshore Bouy", "Walnut Creek Bouy"])
@@ -225,9 +234,22 @@ leaflet_map = create_leaflet_map(selected_location)
 # Display the Leaflet map using st.markdown
 st.markdown(folium_static(leaflet_map), unsafe_allow_html=True)
 
-file_path = "/Users/benjaminmakhlouf/Downloads/daily_tidy_all_data.csv"
-df = pd.read_csv(file_path)
+### HARD CODE TO BRING IN THE DATA 
+#file_path = "/Users/benjaminmakhlouf/Downloads/daily_tidy_all_data.csv"
+#df = pd.read_csv(file_path)
 
+## go the directory name 
+dirname = os.path.dirname(__file__)
+
+# Set location to correct frequency csv
+#if frequency_selected == "Daily":
+#    df = df_creation(dirname, "/daily_tidy_all_data.csv")
+#else:
+#    df = df_creation(dirname, "/hourly_tidy_all_data.csv")
+
+
+
+### DOUBLE CHECK 
 df['times'] = pd.to_datetime(df['times'])  # make sure times are in datetime
 df['value_mean'] = pd.to_numeric(df['value_mean'])  # make sure value_mean is numeric
 
@@ -236,6 +258,7 @@ selected_parameter = st.selectbox("Select Parameter", ["Air_Temperature", "Barom
 
 selected_parameter = "Air_Temperature"
 print(df)
+
 # create a new data frame that is the new selected parameter only 
 df_param = df[df['parameter'] == selected_parameter]
 
