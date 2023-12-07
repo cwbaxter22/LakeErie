@@ -8,7 +8,7 @@ import pandas as pd
 
 from config_combine import COMBINE_MAP
 
-def combine_data_sources():
+def combine_data_sources() -> None:
     """
     This function combines the data from all 3 sources (iChart, Old, New) 
     from data/processed into a single combined dataset and saves to
