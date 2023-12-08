@@ -37,3 +37,6 @@ class TestMapMainFunction(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             leaflet_map_mod.map_main("Buoy 3")
         self.assertEqual(str(context.exception), "Invalid coordinates for buoy 'Invalid Buoy'. Latitude and longitude must be numeric.")
+
+if __name__ == '__main__':
+    unittest.main()

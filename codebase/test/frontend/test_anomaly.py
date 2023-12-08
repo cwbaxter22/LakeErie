@@ -128,3 +128,5 @@ class TestAnomalyDecompFunction(unittest.TestCase):
         result = anomaly_mod.anomaly_decomp(data)
         # Check if the anomaly DataFrame is created and has non-zero values
 
+if __name__ == '__main__':
+    unittest.main()

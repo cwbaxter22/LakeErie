@@ -84,3 +84,6 @@ class Testcreate_leaflet_map(unittest.TestCase):
 
     def test_seven_stations(self):
         "test to make sure there are 7 stations in the map, expecting raisevalueerror if not"
+
+if __name__ == '__main__':
+    unittest.main()
