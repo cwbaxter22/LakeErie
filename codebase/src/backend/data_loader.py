@@ -13,7 +13,7 @@ from typing import Dict
 from config_combine import PARAMETERS
 
 
-class DataLoader(): 
+class DataLoader():
     """
     This class can be used to load data from the wqdatalive API.
     1) It can construct a url based on the parameters passed in
@@ -31,7 +31,7 @@ class DataLoader():
         self.apiKey = apiKey
         self.project = project
 
-        # This is "state information" to keep track of processed data 
+        # This is "state information" to keep track of processed data
         self.processed_device_parameters = defaultdict(list)
         self.processed_devices = []
         self.current_start_time = None
@@ -62,7 +62,7 @@ class DataLoader():
 
         return True
 
-    def get_devices(self) -> Dict: 
+    def get_devices(self) -> Dict:
         """
         Get the list of devices for our project
 
@@ -70,7 +70,7 @@ class DataLoader():
         ----------
         devices (dict): {device_name: device_id}
         """
-        if self.devices == None:
+        if self.devices is None:
             devices = {}
             data = self.api_call(url=f"/api/v1/devices?apiKey={self.apiKey}")
             
@@ -100,7 +100,7 @@ class DataLoader():
 
         Returns: 
         ----------
-        parameters (dict): {parameter_name: parameter_id}
+        parameters (dict): {parameter_name: (parameter_id, parameter_unit)}
         """
         parameters = {}
         data = self.api_call(url=f"/api/v1/devices/{deviceId}/parameters?apiKey={self.apiKey}")
@@ -109,7 +109,7 @@ class DataLoader():
             return None
 
         # If no errors, parse data
-        for d in data["parameters"]: 
+        for d in data["parameters"]:
             parameter_name = d["name"].replace(" ", "_")
             if parameter_name in PARAMETERS:
                 parameters[parameter_name] = (d["id"], d["unit"])
@@ -121,9 +121,9 @@ class DataLoader():
 
 
     def get_data(self,
-        deviceId: str, 
-        parameterId: str, 
-        start_date: str, 
+        deviceId: str,
+        parameterId: str,
+        start_date: str,
         end_date: str
     ) -> Dict:
         """
@@ -156,7 +156,7 @@ class DataLoader():
                 times.append(d["timestamp"])
                 values.append(d["value"])
 
-            return pd.DataFrame({"times": times, "values": values}) 
+            return pd.DataFrame({"times": times, "values": values})
 
         except Exception as e:
             print(e)
