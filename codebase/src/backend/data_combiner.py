@@ -37,10 +37,11 @@ for name, all_device in COMBINE_MAP.items():
     combined_df = combined_df[~((combined_df['parameter'] == 'Air_Temperature') & (combined_df['value_mean'] <-50))]
     #combined_df = combined_df[~((combined_df['parameter'] == 'Temperature') & (combined_df['value_mean'] > 110))]
     combined_df = combined_df[~((combined_df['parameter'] == 'Temperature') & (combined_df['value_mean'] <-50))]
+    combined_df = combined_df[~((combined_df['parameter'] == 'ODO') & (combined_df['value_mean'] < -10))]
     
     if not os.path.exists(f"../../data/processed/combined/{name}"):
         os.mkdir(f"../../data/processed/combined/{name}")
-    combined_df.to_csv(f"../../data/processed/combined/{name}/daily.csv")
+    combined_df.to_csv(f"../../data/processed/combined/{name}/daily_data.csv")
 
 # Run for hourly data
 for name, all_device in COMBINE_MAP.items():
@@ -72,7 +73,8 @@ for name, all_device in COMBINE_MAP.items():
     combined_df = combined_df[~((combined_df['parameter'] == 'Air_Temperature') & (combined_df['value_mean'] > 110))]
     combined_df = combined_df[~((combined_df['parameter'] == 'Air_Temperature') & (combined_df['value_mean'] <-50))]
     #combined_df = combined_df[~((combined_df['parameter'] == 'Temperature') & (combined_df['value_mean'] > 110))]
-    combined_df = combined_df[~((combined_df['parameter'] == 'Temperature') & (combined_df['value_mean'] <-50))]
+    combined_df = combined_df[~((combined_df['parameter'] == 'Temperature') & (combined_df['value_mean'] <-40))]
+    combined_df = combined_df[~((combined_df['parameter'] == 'ODO') & (combined_df['value_mean'] < -10))]
     
 
 
@@ -81,6 +83,6 @@ for name, all_device in COMBINE_MAP.items():
 
     if not os.path.exists(f"../../data/processed/combined/{name}"):
         os.mkdir(f"../../data/processed/combined/{name}")
-    combined_df.to_csv(f"../../data/processed/combined/{name}/hourly.csv")
+    combined_df.to_csv(f"../../data/processed/combined/{name}/hourly_data.csv")
 
 

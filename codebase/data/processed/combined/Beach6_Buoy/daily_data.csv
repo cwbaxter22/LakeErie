@@ -1653,8 +1653,6 @@ times,parameter,Units,value_mean,value_std,location
 2021-11-04,ODO,mg/L,11.662708333333333,0.1448553329594454,Beach6_Buoy
 2021-11-05,ODO,mg/L,12.601875,1.5832877400412044,Beach6_Buoy
 2021-11-06,ODO,mg/L,14.922916666666667,1.585997367409566,Beach6_Buoy
-2021-11-07,ODO,mg/L,-37490.94395833334,48439.493937118335,Beach6_Buoy
-2021-11-08,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
 2021-11-09,ODO,mg/L,,,Beach6_Buoy
 2021-11-10,ODO,mg/L,,,Beach6_Buoy
 2021-11-11,ODO,mg/L,,,Beach6_Buoy
@@ -1832,8 +1830,6 @@ times,parameter,Units,value_mean,value_std,location
 2022-05-02,ODO,mg/L,,,Beach6_Buoy
 2022-05-03,ODO,mg/L,,,Beach6_Buoy
 2022-05-04,ODO,mg/L,,,Beach6_Buoy
-2022-05-05,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2022-05-06,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
 2022-05-07,ODO,mg/L,,,Beach6_Buoy
 2022-05-08,ODO,mg/L,,,Beach6_Buoy
 2022-05-09,ODO,mg/L,10.341176470588234,0.1441957018722684,Beach6_Buoy
@@ -2005,18 +2001,6 @@ times,parameter,Units,value_mean,value_std,location
 2022-10-22,ODO,mg/L,11.144166666666669,0.0642036315872504,Beach6_Buoy
 2022-10-23,ODO,mg/L,11.040625,0.0855867579977123,Beach6_Buoy
 2022-10-24,ODO,mg/L,10.925625,0.2041219701269928,Beach6_Buoy
-2022-10-25,ODO,mg/L,-33325.919375,47180.812381503245,Beach6_Buoy
-2022-10-26,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2022-10-27,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2022-10-28,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2022-10-29,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2022-10-30,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2022-10-31,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2022-11-01,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2022-11-02,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2022-11-03,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2022-11-04,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2022-11-05,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
 2022-11-06,ODO,mg/L,,,Beach6_Buoy
 2022-11-07,ODO,mg/L,,,Beach6_Buoy
 2022-11-08,ODO,mg/L,,,Beach6_Buoy
@@ -2194,8 +2178,6 @@ times,parameter,Units,value_mean,value_std,location
 2023-04-29,ODO,mg/L,,,Beach6_Buoy
 2023-04-30,ODO,mg/L,,,Beach6_Buoy
 2023-05-01,ODO,mg/L,,,Beach6_Buoy
-2023-05-02,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
-2023-05-03,ODO,mg/L,-100000.0,0.0,Beach6_Buoy
 2023-05-04,ODO,mg/L,,,Beach6_Buoy
 2023-05-05,ODO,mg/L,,,Beach6_Buoy
 2023-05-06,ODO,mg/L,,,Beach6_Buoy
