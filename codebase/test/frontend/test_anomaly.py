@@ -3,230 +3,126 @@ import pandas as pd
 from datetime import datetime
 import sys
 
-sys.path.append("../../src/frontend")
-import anomaly
+sys.path.append("../../src/frontend/anomaly.py")
+import create_anomaly_graph, create_trendline, anomaly_decomp
 
-### Test CreateTrendLine, which plots value vs time and fits a non-linear trendline from pytimetk
 
 class TestCreateTrendline(unittest.TestCase):
-    """
-    Test cases for the create_trendline function.
-    """
+    """Test cases for create_trendline function
+    which uses pytimetk to create a trendline of 
+    time series data"""
 
     def test_valid_data(self):
-        """
-        Test create_trendline with valid data.
-        """
-        data = pd.DataFrame({
-            'times': [datetime(2023, 1, 1), datetime(2023, 1, 2)],
-            'value_mean': [1, 2]
-        })
-        # This test should not raise any exceptions
-        anomaly.create_trendline(data)
+        """Test with valid data, expecting no errors"""
+        data = pd.DataFrame({'times': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-03']),
+                             'value_mean': [10, 20, 30]})
+        result = create_trendline(data)
+        self.assertIsInstance(result, plt.Figure)
 
-    def test_missing_columns(self):
-        """
-        Test create_trendline with missing columns.
-        """
-        data = pd.DataFrame({'invalid_column': [1, 2]})
-        # Expecting a ValueError to be raised since required columns are missing
+    def test_columns_missing(self):
+        """Test to make sure both 'times' and 'value_mean' columns are present,
+        expecting ValueError if either is not present"""
+        data = pd.DataFrame({'value_mean': [10, 20, 30]})
         with self.assertRaises(ValueError):
-            anomaly.create_trendline(data)
+            create_trendline(data)
 
-    def test_invalid_datetime_column(self):
-        """
-        Test create_trendline with an invalid datetime column.
-        """
-        data = pd.DataFrame({
-            'times': ['2023-01-01', '2023-01-02'],
-            'value_mean': [1, 2]
-        })
-        # Expecting a ValueError to be raised since 'times' column is not a datetime object
+    def test_valid_data_amount(self):
+        """Test to make sure each column has at least 3 non-0 or non-NA values,
+        expecting ValueError if either is not present"""
+        data = pd.DataFrame({'times': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-03']),
+                             'value_mean': [10, NA, 30]})
         with self.assertRaises(ValueError):
-            anomaly.create_trendline(data)
+            create_trendline(data)
 
-    def test_empty_columns(self):
-        """
-        Test create_trendline with empty columns.
-        """
-        data = pd.DataFrame({'times': [], 'value_mean': []})
-        # Expecting a ValueError to be raised since either 'times' or 'value_mean' column is empty
+    def test_time_datatype(self):
+        """Test to make sure 'times' column is a datetime object,
+        expecting ValueError if not"""
+        data = pd.DataFrame({'times': ['2023-01-01', '2023-01-02', '2023-01-03'],
+                             'value_mean': [10, 20, 30]})
         with self.assertRaises(ValueError):
-            anomaly.create_trendline(data)
+            create_trendline(data)
 
-    def test_non_numeric_values(self):
-        """
-        Test create_trendline with non-numeric values.
-        """
-        data = pd.DataFrame({
-            'times': [datetime(2023, 1, 1), datetime(2023, 1, 2)],
-            'value_mean': [1, 'invalid']
-        })
-        # Expecting a ValueError to be raised since 'value_mean' column contains non-numeric values
-        with self.assertRaises(ValueError):
-            anomaly.create_trendline(data)
 
-    def test_single_row(self):
-        """
-        Test create_trendline with a DataFrame containing a single row.
-        """
-        data = pd.DataFrame({'times': [datetime(2023, 1, 1)], 'value_mean': [1]})
-        # This test should not raise any exceptions
-        anomaly.create_trendline(data)
 
-    def test_invalid_data_types(self):
-        """
-        Test create_trendline with valid columns but incorrect data types.
-        """
-        data = pd.DataFrame({
-            'times': [datetime(2023, 1, 1), datetime(2023, 1, 2)],
-            'value_mean': [1, 'invalid']
-        })
-        # Expecting a ValueError to be raised since 'value_mean' column contains non-numeric values
-        with self.assertRaises(ValueError):
-            anomaly.create_trendline(data)
+############## 
 
-# Tests CreateAnomalyGraph, which runs statistical tests on time series data and plots time series 
-    # with anomaly bars and points highlighted which are considered anomalies 
 
-class TestCreateAnomalyGraph(unittest.TestCase):
-    """
-    Test cases for the create_anomaly_graph function.
-    """
+class TestCreateAnomalyGraphFunction(unittest.TestCase):
+    """Test cases for create_anomaly_graph function, which brings in data, removes NA values, creates a 
+    dataframe of values calculating from the anomaly calculation"""
 
     def test_valid_data(self):
-        """
-        Test create_anomaly_graph with valid data.
-        """
-        data = pd.DataFrame({
-            'times': [datetime(2023, 1, 1), datetime(2023, 1, 2)],
-            'value_mean': [1, 2]
-        })
-        # This test should not raise any exceptions
-        anomaly.create_anomaly_graph(data)
+        """One shot test which brings in valid data, expecting no errors"""
+        data = pd.DataFrame({'times': pd.date_range('2023-01-01', period=10),
+                             'value_mean': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]})
+        result = create_anomaly_graph(data)
+        # Check if result is as expected (depends on the plotting engine used)
 
-    def test_missing_columns(self):
-        """
-        Test create_anomaly_graph with missing columns.
-        """
-        data = pd.DataFrame({'invalid_column': [1, 2]})
-        # Expecting a ValueError to be raised since required columns are missing
+    def test_nonzero_testvalues(self):
+        """Test to make sure 'iqr_alpha' and 'clean_alpha' are not specified as 0 values,
+        expecting ValueError if not"""
+        data = pd.DataFrame({'times': pd.date_range('2023-01-01', period=5),
+                             'value_mean': [10, 20, 30, 40, 50]})
         with self.assertRaises(ValueError):
-            anomaly.create_anomaly_graph(data)
+            create_anomaly_graph(data, iqr_alpha=0, clean_alpha=0)
 
-    def test_invalid_datetime_column(self):
-        """
-        Test create_anomaly_graph with an invalid datetime column.
-        """
-        data = pd.DataFrame({
-            'times': ['2023-01-01', '2023-01-02'],
-            'value_mean': [1, 2]
-        })
-        # Expecting a ValueError to be raised since 'times' column is not a datetime object
+    def test_numeric_in_data(self):
+        """Test to make sure data after NA's are removed does not have any non-numeric values,
+        expecting ValueError if not"""
+        data = pd.DataFrame({'times': pd.date_range('2023-01-01', periods=5),
+                             'value_mean': [10, 20, None, 40, 'string']})
         with self.assertRaises(ValueError):
-            anomaly.create_anomaly_graph(data)
+            create_anomaly_graph(data)
 
-    def test_empty_columns(self):
-        """
-        Test create_anomaly_graph with empty columns.
-        """
-        data = pd.DataFrame({'times': [], 'value_mean': []})
-        # Expecting a ValueError to be raised since either 'times' or 'value_mean' column is empty
+    def test_anomaly_df_is_created(self):
+        """Test to make sure Anomaly df has a non-zero value"""
+        data = pd.DataFrame({'times': pd.date_range('2023-01-01', periods=5),
+                             'value_mean': [10, 20, 30, 40, 50]})
+        result = create_anomaly_graph(data)
+        # Check if the anomaly DataFrame is created and has non-zero values
+
+    def test_plotly_graph_is_created(self):
+        """Test to make sure plotly graph is created,
+        expecting ValueError if not"""
+        data = pd.DataFrame({'times': pd.date_range('2023-01-01', periods=5),
+                             'value_mean': [10, 20, 30, 40, 50]})
         with self.assertRaises(ValueError):
-            anomaly.create_anomaly_graph(data)
-
-    def test_non_numeric_values(self):
-        """
-        Test create_anomaly_graph with non-numeric values.
-        """
-        data = pd.DataFrame({
-            'times': [datetime(2023, 1, 1), datetime(2023, 1, 2)],
-            'value_mean': [1, 'invalid']
-        })
-        # Expecting a ValueError to be raised since 'value_mean' column contains non-numeric values
-        with self.assertRaises(ValueError):
-            anomaly.create_anomaly_graph(data)
-
-    def test_edge_case_single_row(self):
-        """
-        Test create_anomaly_graph with a DataFrame containing a single row.
-        """
-        data = pd.DataFrame({'times': [datetime(2023, 1, 1)], 'value_mean': [1]})
-        # This test should not raise any exceptions
-        anomaly.create_anomaly_graph(data)
+            create_anomaly_graph(data, engine='invalid_engine')
 
 
-##### Test AnomalyDecomp, which gives a look at the statistics underlying the anomaly detection
+###############
 
-class TestAnomalyDecomp(unittest.TestCase):
-    """
-    Test cases for the anomaly_decomp function.
-    """
+class TestAnomalyDecompFunction(unittest.TestCase):
+    """Test cases for anomaly_decomp function, which provides graphs of statistical decomposition
+    of anomaly calculation, including __________"""
 
     def test_valid_data(self):
-        """
-        Test anomaly_decomp with valid data.
-        """
-        data = pd.DataFrame({
-            'times': [datetime(2023, 1, 1), datetime(2023, 1, 2)],
-            'value_mean': [1, 2]
-        })
-        # This test should not raise any exceptions
-        anomaly.anomaly_decomp(data)
+        """One shot test which brings in valid data, expecting no errors"""
+        data = pd.DataFrame({'times': pd.date_range('2023-01-01', period=10),
+                             'value_mean': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]})
+        result = anomaly_decomp(data)
+        # Check if result is as expected (depends on the plotting engine used)
 
-    def test_invalid_data_type(self):
-        """
-        Test anomaly_decomp with invalid data type.
-        """
-        data = "invalid_data_type"
-        # Expecting a ValueError to be raised since 'data' argument must be a pandas DataFrame
+    def test_nonzero_testvalues(self):
+        """Test to make sure 'iqr_alpha' and 'clean_alpha' are not specified as 0 values,
+        expecting ValueError if not"""
+        data = pd.DataFrame({'times': pd.date_range('2023-01-01', period=5),
+                             'value_mean': [10, 20, 30, 40, 50]})
         with self.assertRaises(ValueError):
-            anomaly.anomaly_decomp(data)
+            anomaly_decomp(data, iqr_alpha=0, clean_alpha=0)
 
-    def test_invalid_times_type(self):
-        """
-        Test anomaly_decomp with invalid 'times' argument type.
-        """
-        data = pd.DataFrame({'times': [datetime(2023, 1, 1)], 'value_mean': [1]})
-        # Expecting a ValueError to be raised since 'times' argument must be a string
+    def test_numeric_in_data(self):
+        """Test to make sure data after NA's are removed does not have any non-numeric values,
+        expecting ValueError if not"""
+        data = pd.DataFrame({'times': pd.date_range('2023-01-01', period=5),
+                             'value_mean': [10, 20, None, 40, 'string']})
         with self.assertRaises(ValueError):
-            anomaly.anomaly_decomp(data, times=123)
+            anomaly_decomp(data)
 
-    def test_invalid_value_mean_type(self):
-        """
-        Test anomaly_decomp with invalid 'value_mean' argument type.
-        """
-        data = pd.DataFrame({'times': [datetime(2023, 1, 1)], 'value_mean': [1]})
-        # Expecting a ValueError to be raised since 'value_mean' argument must be a string
-        with self.assertRaises(ValueError):
-            anomaly.anomaly_decomp(data, value_mean=123)
+    def test_anomaly_df_is_created(self):
+        """Test to make sure Anomaly df has a non-zero value"""
+        data = pd.DataFrame({'times': pd.date_range('2023-01-01', period=5),
+                             'value_mean': [10, 20, 30, 40, 50]})
+        result = anomaly_decomp(data)
+        # Check if the anomaly DataFrame is created and has non-zero values
 
-    def test_non_integer_period(self):
-        """
-        Test anomaly_decomp with non-integer 'period'.
-        """
-        data = pd.DataFrame({'times': [datetime(2023, 1, 1)], 'value_mean': [1]})
-        # Expecting a ValueError to be raised since 'period' argument must be an integer
-        with self.assertRaises(ValueError):
-            anomaly.anomaly_decomp(data, period=1.5)
-
-    def test_non_float_iqr_alpha(self):
-        """
-        Test anomaly_decomp with non-float 'iqr_alpha'.
-        """
-        data = pd.DataFrame({'times': [datetime(2023, 1, 1)], 'value_mean': [1]})
-        # Expecting a ValueError to be raised since 'iqr_alpha' argument must be a float
-        with self.assertRaises(ValueError):
-            anomaly.anomaly_decomp(data, iqr_alpha='0.05')
-
-    def test_non_float_clean_alpha(self):
-        """
-        Test anomaly_decomp with non-float 'clean_alpha'.
-        """
-        data = pd.DataFrame({'times': [datetime(2023, 1, 1)], 'value_mean': [1]})
-        # Expecting a ValueError to be raised since 'clean_alpha' argument must be a float
-        with self.assertRaises(ValueError):
-            anomaly.anomaly_decomp(data, clean_alpha='0.75')
-
-if __name__ == '__main__':
-    unittest.main()

@@ -39,7 +39,6 @@ dirname = os.path.dirname(__file__)
 #    df = df_creation(dirname, "/hourly_tidy_all_data.csv")
 
 
-
 ### DOUBLE CHECK 
 df['times'] = pd.to_datetime(df['times'])  # make sure times are in datetime
 df['value_mean'] = pd.to_numeric(df['value_mean'])  # make sure value_mean is numeric
