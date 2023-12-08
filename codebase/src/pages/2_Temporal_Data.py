@@ -8,6 +8,7 @@ time set from the widget (st.dateinput()) that is initially in datetime.date() a
 is then converted to np64 datetime"""
 
 import os
+import pathlib
 import datetime
 import streamlit as st
 import sys
@@ -25,9 +26,13 @@ from frontend import df_manip_plotting
 st.set_page_config(layout="wide")
 st.title("Historical Buoy Data")
 # Relative path to /pages
-dirname = os.path.dirname(__file__)
-data_path = str(dirname) + "/data/iChart6_data/processed/"
-df_viz, var_plot, loc_to_plot, start_date_to_plot, end_date_to_plot = df_manip_plotting.df_creation(data_path)
+codebase_path = pathlib.Path(__file__).parents[2]
+data_path = str(codebase_path) + "/data/processed/combined/"
+try:
+    df_viz, var_plot, loc_to_plot, start_date_to_plot, end_date_to_plot = df_manip_plotting.df_creation(data_path)
+except:
+    print("Dataframe error")
+#print(df_viz.head())
 try:
     # Choose between either chronological or annual comparison view
     data_comparison_type = st.radio(

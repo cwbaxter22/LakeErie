@@ -28,9 +28,9 @@ def df_creation(path_to_df: str):
     )
     # Set location to correct frequency csv
     if frequency_selected == "Daily":
-        data_frequency = "/daily_tidy_all_data.csv"
+        data_frequency = "/daily_data.csv"
     else:
-        data_frequency = "/hourly_tidy_all_data.csv"
+        data_frequency = "/hourly_data.csv"
     #Hourly or daily choice - default is daily
     st.subheader("Select data locations")
     # Static list of data collection sites
@@ -99,6 +99,7 @@ def df_creation(path_to_df: str):
             df_loc_time_selection = df_intime.query(
                 "location == @locations_to_graph").query(
                     f"parameter=='{variable_to_plot}'")
+            #print(f"From in function {df_loc_time_selection.head()}")
             return df_loc_time_selection, variable_to_plot, locations_to_graph, START_DATE, END_DATE
 
 def create_all_time_fig(df_alltime: pd.DataFrame(),
@@ -142,15 +143,21 @@ def create_all_time_fig(df_alltime: pd.DataFrame(),
                             title = graph_title,
                             color = "location",
                             error_y = "value_std",
-                            labels={"value_mean": f"{alltime_var} [{df_figure_data['Units'][0]}]",
+                            hover_data=['Units'],
+                            labels={"value_mean": f"{alltime_var}]",
                                     "times" : "Time"})
+        #If we want to get units immediately after the label: [{df_figure_data['Units'][9703]}]
+        #We would need a row number within the selected data
+        #May be a better option another way
     else:
-        all_time_fig = px.scatter(df_figure_data, x = "times",
-                        y = "value_mean",
-                        title = graph_title,
-                        color = "location",
-                        labels={"value_mean": f"{alltime_var} [{df_figure_data['Units'][0]}]",
-                                "times" : "Time"})
+        print(df_figure_data.head())
+        all_time_fig = px.scatter(df_figure_data,
+                                  x = "times",
+                                  y = "value_mean",
+                                  title = graph_title,
+                                  color = "location",
+                                  hover_data=['Units'],
+                                  labels={"value_mean": f"{alltime_var}" })
     return all_time_fig
 
 def create_annual_comparison_fig(df_annual:pd.DataFrame(),
@@ -211,7 +218,7 @@ def create_annual_comparison_fig(df_annual:pd.DataFrame(),
                                 hover_data = ["year", "timepoint", "location", "value_std"],
                                 error_y = "value_std",
                                 labels={"value_mean": \
-                                        f"{comparison_variable} [{df_yearly_comp['Units'][0]}]",
+                                        f"{comparison_variable}",
                                         "timepoint" : "Month/Day",
                                         "location" : "Location",
                                         "value_std" : "Std Deviation"
@@ -224,7 +231,7 @@ def create_annual_comparison_fig(df_annual:pd.DataFrame(),
                         symbol = "year",
                         hover_data = ["year", "timepoint", "location", "value_std"],
                         labels={"value_mean": \
-                                f"{comparison_variable} [{df_yearly_comp['Units'][0]}]",
+                                f"{comparison_variable}",
                                 "timepoint" : "Month/Day",
                                 "location" : "Location",
                                 "value_std" : "Std Deviation"
