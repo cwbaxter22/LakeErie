@@ -13,16 +13,22 @@ tests:
     * smoke_test - confirm the function is able to run.
     
 """
+import importlib
 import unittest
+import pathlib
+import pandas as pd
 import plotly.express as px
-import sys
 
-# Add path to pages
-#codebase_path = pathlib.Path(__file__).parents[2]
-#sys.path.append("../../src/pages")
-# Get creative importing streamlit pages, since they begin with a number
-sys.path.append("../../src/pages")
-TemporalData = __import__('2_Temporal_Data')
+codebase_path = pathlib.Path(__file__).parents[2]
+
+#https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
+spec = importlib.util.spec_from_file_location(
+    name='plotting_mod',  # name is not related to the file, it's the module name!
+    location= str(codebase_path) +
+    "//src//frontend//df_manip_plotting.py"  # full path to the script
+)
+df_manip_plotting_mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(df_manip_plotting_mod)
 
 
 class TestGUIMethods(unittest.TestCase):
@@ -30,11 +36,14 @@ class TestGUIMethods(unittest.TestCase):
     def test_smoke(self):
         """
         Testing that the plot function generates a figure using simple, arbitrary scatter plot
+        Arbitrary data from https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html
 
         """
         try:
             fig = px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])
-            TemporalData.plot_it(fig)
+            d = {'col1': [1, 2], 'col2': [3, 4]}
+            df = pd.DataFrame(data=d)
+            df_manip_plotting_mod.plot_it(fig, df)
         except RuntimeError:
             self.assertRaises(RuntimeError)
 
