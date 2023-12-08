@@ -8,11 +8,15 @@ sys.path.append("../../src/backend")
 from data_transformer import DataTransformer
 
 
-
-
-
-
 class TestDataTransformer(unittest.TestCase):
+    """
+    Test Class for DataTransformer and each of the following functions:
+    1) across_parameter_aggregate
+    2) tidy_data_transform
+    3) downsample_hour
+    4) downsample_day
+
+    """
     
     #test to make sure that the function can call DataLoader.get_devices()
     #def test_get_devices(self):
@@ -20,6 +24,57 @@ class TestDataTransformer(unittest.TestCase):
         #self.assertEqual(dataTransformer.get_devices(), None)
 
     def setUp(self) -> None:
+        """
+        This function creates a test directory with the following structure:
+        testdata
+        ├── processed
+        │   ├── new
+        │   │   ├── Beach2_Buoy
+        │   │   │   ├── Air_Temperature.csv
+        │   │   │   └── ODO.csv
+        │   │   └── TREC_Tower
+        │   │       ├── Air_Temperature.csv
+        │   │       └── ODO.csv
+        │   ├── old
+        │   │   ├── Beach2_Buoy
+        │   │   │   ├── Air_Temperature.csv
+        │   │   │   └── ODO.csv
+        │   │   └── TREC_Tower
+        │   │       ├── Air_Temperature.csv
+        │   │       └── ODO.csv
+        │   └── iChart
+        │       ├── Beach2_Buoy
+        │       │   ├── Air_Temperature.csv
+        │       │   └── ODO.csv
+        │       └── TREC_Tower
+        │           ├── Air_Temperature.csv
+        │           └── ODO.csv
+        └── raw
+            ├── new
+            │   ├── Beach2_Buoy
+            │   │   ├── Air_Temperature.csv
+            │   │   └── ODO.csv
+            │   └── TREC_Tower
+            │       ├── Air_Temperature.csv
+            │       └── ODO.csv
+            ├── old
+            │   ├── Beach2_Buoy
+            │   │   ├── Air_Temperature.csv
+            │   │   └── ODO.csv
+            │   └── TREC_Tower
+            │       ├── Air_Temperature.csv
+            │       └── ODO.csv
+            └── iChart
+                ├── Beach2_Buoy
+                │   ├── Air_Temperature.csv
+                │   └── ODO.csv
+                └── TREC_Tower
+                    ├── Air_Temperature.csv
+                    └── ODO.csv
+        
+        We do this to create all of the files that we would have in the real directory.
+
+        """
         self.devices = ["TREC_Tower", "Beach2_Buoy"]
         self.project = ["new", "old", "iChart"]
         self.dataTransformer = DataTransformer()
@@ -39,11 +94,18 @@ class TestDataTransformer(unittest.TestCase):
         self.dataTransformer.set_path("../testdata/raw", "../testdata/processed")
 
     def tearDown(self) -> None:
+        """
+        This function calls wipe_test_data which will delete the test directory created in setUp
+        
+        """
         self.wipe_test_data()
         pass
 
     #remove all csv files in the directory
     def wipe_test_data(self):
+        """
+        This function deletes all of the csv files in the test directory
+        """
         
         directories = [
             "../testdata/raw/new/TREC_Tower",
@@ -71,6 +133,8 @@ class TestDataTransformer(unittest.TestCase):
         """
         Creates a test CSV file with the following columns:
         times, parameter1, parameter2, parameter3
+
+        We can then use this to test the across_parameter_aggregate function.
         """
         
         data = {
@@ -92,6 +156,12 @@ class TestDataTransformer(unittest.TestCase):
     
     def create_all_data_csv(self, test_csv_path: str) -> None:
         """
+        Creates a test CSV file with the following columns:
+        times, ODO, Units, Air_Temperature
+
+        This dataframe is the result of the across_parameter_aggregate function.
+        We use this to test the tidy_data_transform function.
+
         """
         data = {
             "times": [
@@ -112,6 +182,15 @@ class TestDataTransformer(unittest.TestCase):
         df.to_csv(f"{test_csv_path}/all_data.csv", index=False)
 
     def create_tidy_all_data_csv(self, test_csv_path: str) -> None:
+        """
+        Creates a test CSV file with the following columns:
+        times, Units, parameter, value
+
+        This dataframe is the output of the tidy_data_transform function.
+
+        We use this to test the downsample_hour and downsample_day functions.
+        
+        """
         data = {
             "times": ["1/1/2018 13:10", "1/1/2018 13:10", "1/1/2018 13:20", "1/1/2018 13:20", "1/1/2018 13:30", "1/1/2018 13:30"],
             "Units": ["mg/L", "F", "mg/L", "F", "mg/L", "F"],
@@ -124,8 +203,14 @@ class TestDataTransformer(unittest.TestCase):
         data.to_csv(f"{test_csv_path}/tidy_all_data.csv", index=False)
 
 
-    #smoke test
     def test_across_parameter_aggregate(self):
+        """
+        This function tests that the across_parameter_aggregate function in the DataTransformer class
+        correctly merges the csv files in the raw directory and writes the result to the processed directory.
+
+        """
+
+
         expected_columns = ['times', 'ODO', 'Units', 'Air_Temperature']
         expected_data = {
             "times": ["1/1/2018 13:10", "1/1/2018 13:20", "1/1/2018 13:30", "1/1/2018 13:10", "1/1/2018 13:20", "1/1/2018 13:30"],
@@ -146,6 +231,11 @@ class TestDataTransformer(unittest.TestCase):
 
 
     def test_tidy_data_transform(self):
+        """
+        This function tests that the tidy_data_transform function in the DataTransformer class
+        correctly transforms the data from the across_parameter_aggregate function and writes the result to the processed directory.
+        """
+
         expected_data = {
             "times": ["1/1/2018 13:10", "1/1/2018 13:10", "1/1/2018 13:20", "1/1/2018 13:20", "1/1/2018 13:30", "1/1/2018 13:30"],
             "Units": ["mg/L", "F", "mg/L", "F", "mg/L", "F"],
@@ -168,6 +258,10 @@ class TestDataTransformer(unittest.TestCase):
 
 
     def test_downsample_hour(self):
+        """
+        This function tests that the downsample_hour function in the DataTransformer class
+        correctly downsamples the data from the tidy_data_transform function and writes the result to the processed directory.
+        """
 
         expected_data = {
             "parameter": ["Air_Temperature", "ODO"],
@@ -197,6 +291,10 @@ class TestDataTransformer(unittest.TestCase):
 
 
     def test_downsample_day(self):
+        """
+        This function tests that the downsample_day function in the DataTransformer class
+        correctly downsamples the data from the tidy_data_transform function and writes the result to the processed directory.
+        """
 
         expected_data = {
             "parameter": ["Air_Temperature", "ODO"],
