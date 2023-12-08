@@ -35,9 +35,9 @@ def df_creation(path_to_df: str):
     st.subheader("Select data locations")
     # Static list of data collection sites
     # Names of the csv files
-    LOCATIONS_UNFORMATTED = ["Beach2_Buoy", "Beach2_Tower", "Beach6_Buoy", "TREC_Tower"]
+    LOCATIONS_UNFORMATTED = ["Beach2_Buoy", "Beach2_Tower", "Beach6_Buoy", "Trec_Tower"]
     # Names of locations user can pick from
-    LOCATIONS_DISPLAY = ["Beach 2 Buoy", "Beach 2 Tower", "Beach 6 Buoy", "TREC Tower"]
+    LOCATIONS_DISPLAY = ["Beach 2 Buoy", "Beach 2 Tower", "Beach 6 Buoy", "Trec Tower"]
     # Checkboxes for user to select collection sites
     locations_selected_display = st.multiselect(
         "Data collection sites",

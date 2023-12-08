@@ -5,25 +5,29 @@ import numpy as np
 import pytimetk
 import plotly.io as pio
 import folium
-from streamlit_folium import folium_static
+import pathlib
+#from streamlit_folium import folium_static
+from frontend import df_manip_plotting
+from frontend import leaflet_map
+from frontend import anomaly
 
-
-###########################################################################################
-######### Streamlit #######################################################################
-########################################################################################### 
-
-## Configure the page 
+# Configure the page 
 st.set_page_config(page_title="Advanced Statistics", layout="wide")
-st.title("Advanced Statistics") # Title for the streamlit app 
+st.title("Advanced Statistics") # Title for the streamlit app
 
 # Drop down menu for location
-selected_location = st.selectbox("Select Location", ["TREQ Station", "Bay Bouy", "Beach 2 Tower", "Beach 2 Bouy", "Beach 6 Bouy", "Nearshore Bouy", "Walnut Creek Bouy"])
+#selected_location = st.selectbox("Select Location", ["TREQ Station", "Bay Bouy", "Beach 2 Tower", "Beach 2 Bouy", "Beach 6 Bouy", "Nearshore Bouy", "Walnut Creek Bouy"])
+
+# Relative path to /pages
+codebase_path = pathlib.Path(__file__).parents[2]
+data_path = str(codebase_path) + "/data/processed/combined/"
+df, var_plot, loc_to_plot, start_date_to_plot, end_date_to_plot = df_manip_plotting.df_creation(data_path)
 
 # Call your function to create the Leaflet map
-leaflet_map = create_leaflet_map(selected_location)
+leaflet_map_current = leaflet_map.map_main(loc_to_plot)
 
 # Display the Leaflet map using st.markdown
-st.markdown(folium_static(leaflet_map), unsafe_allow_html=True)
+st.markdown(folium_static(leaflet_map_current), unsafe_allow_html=True)
 
 ### HARD CODE TO BRING IN THE DATA 
 #file_path = "/Users/benjaminmakhlouf/Downloads/daily_tidy_all_data.csv"
@@ -54,15 +58,15 @@ df_param = df[df['parameter'] == selected_parameter]
 
 print(df_param)
 # Call the create_trendline function to create the trendline figure 
-fig = create_trendline(df_param)
+fig = anomaly.create_trendline(df_param)
 
 # pio.show(fig)
 st.plotly_chart(fig)
 
-fig2 = create_anomaly_graph(df_param)
+fig2 = anomaly.create_anomaly_graph(df_param)
 
 st.plotly_chart(fig2)
 
-dec = anomaly_decomp(df_param)
+dec = anomaly.anomaly_decomp(df_param)
 
 st.plotly_chart(dec)
