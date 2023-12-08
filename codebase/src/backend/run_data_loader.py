@@ -26,7 +26,7 @@ from data_loader import DataLoader
 
 # CREATE GLOBAL TIME CONSTANTS
 START_YEAR = 2014
-CURRENT_YEAR = datetime.date.today().year # TODO: Change this to current year
+CURRENT_YEAR = datetime.date.today().year
 
 def get_times() -> list:
     """
@@ -41,7 +41,7 @@ def get_times() -> list:
         for month in np.arange(1, 13):
             if month >= 10:
                 times.append(f"{year}-{month}-01")
-            else: 
+            else:
                 times.append(f"{year}-0{month}-01")
 
     return times
@@ -55,18 +55,18 @@ def aggregate_data(test: bool = False, old: bool = False, project: str = "new") 
         - if we run out of API calls for that hour before download all the data, 
         we will sleep for 1 hour and then resume
     """
-    if old: 
+    if old:
         apiKey = OLD_API_KEY
-    else: 
+    else:
         apiKey = NEW_API_KEY
 
     # Create Dataloader
     dataLoader = DataLoader(apiKey=apiKey, project=project)
-    Done = False
+    done = False
 
-    while not Done:
+    while not done:
         print("Starting new call")
-        Done = ping_api(dataLoader, test=test)
+        done = ping_api(dataLoader, test=test)
         print("Sleeping for 1 hour")
         time.sleep(3600)
 
@@ -98,7 +98,7 @@ def ping_api(dataLoader, test: bool = False) -> bool:
     # Get Devices for our project
     if dataLoader.devices is None:
         devices = dataLoader.get_devices()
-        if devices == None: 
+        if devices is None:
             return False
     else: 
         devices = dataLoader.devices
@@ -124,7 +124,7 @@ def ping_api(dataLoader, test: bool = False) -> bool:
         if len(dataLoader.device_parameters[device_id]) == 0:
             # If we haven't already gotten parameters for this device, get them
             parameters = dataLoader.get_device_parameters(deviceId=device_id)
-            if parameters == None: 
+            if parameters is None:
                 return False
         else: 
             # Otherwise, grab the parameters for this device
@@ -153,14 +153,14 @@ def ping_api(dataLoader, test: bool = False) -> bool:
                 cur_data = dataLoader.get_data(
                     deviceId=device_id,
                     parameterId=parameter_id,
-                    start_date=times[i], 
+                    start_date=times[i],
                     end_date=times[i+1]
                 )
 
                 if cur_data is None:
                     dataLoader.current_start_time = times[i]
                     return False
-                else: 
+                else:
                     dataLoader.current_start_time = times[i+1]
 
                 cur_data.rename(columns={"values": parameter_name}, inplace=True)
@@ -171,12 +171,18 @@ def ping_api(dataLoader, test: bool = False) -> bool:
                 # Save data for parameter to CSV for current call
                 data["Units"] = parameter_units
                 save_path = os.path.join(device_directory, f"{parameter_name}.csv")
-                data.to_csv(save_path, mode="a", index=False, header=(not os.path.exists(save_path)))
+                data.to_csv(
+                    save_path,
+                    mode="a",
+                    index=False,
+                    header=(not os.path.exists(save_path))
+                )
 
                 # If testing mode, only get first 12 months
-                if (i == 12) and test: break
+                if (i == 12) and test:
+                    break
 
-            # Reset current_start_time to 0 for next parameter 
+            # Reset current_start_time to 0 for next parameter
             dataLoader.current_start_time = times[0]
 
             # Update processed_device_parameters because we have completed this parameter for this device
@@ -186,16 +192,16 @@ def ping_api(dataLoader, test: bool = False) -> bool:
         dataLoader.processed_devices.append(device_name)
 
         # If testing mode, only get first device
-        if test: break
+        if test:
+            break
 
     return True
 
-"""
-Uncomment this block of code to run the aggregate data using the DataLoader
-"""
 if __name__ == "__main__":
-    pass 
-
+    pass
+    """
+    Uncomment this block of code to run the aggregate data using the DataLoader
+    """
     # Set this to True to run in test mode
     # TEST = False
 
