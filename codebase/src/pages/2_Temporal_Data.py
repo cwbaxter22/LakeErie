@@ -1,23 +1,12 @@
-"""Module that generates web interface for user to generate plots and view data
+"""Generate web interface for users to view buoy and site variable data
 
-This page creates a plot from sites chosen by the user.
+Users will be prompted to choose location(s), variable, start time, and end time."""
 
-Current time comparison setup for setting date range is comparing the time from the
-initial dataframe (imported as a string and converted to np64 datetime) to the 
-time set from the widget (st.dateinput()) that is initially in datetime.date() and
-is then converted to np64 datetime"""
-
-import os
 import pathlib
-import datetime
+import logging
 import streamlit as st
-import sys
-import pandas as pd
-import plotly.express as px
-from plotly import graph_objects
-import numpy as np
 
-# Note: For this import to work, 
+# Note: For this import to work,
 # the 2_Temporal_Data.py module needs to be run from a file within the src folder
 from frontend import df_manip_plotting
 
@@ -27,12 +16,17 @@ st.set_page_config(layout="wide")
 st.title("Historical Buoy Data")
 # Relative path to /pages
 codebase_path = pathlib.Path(__file__).parents[2]
-data_path = str(codebase_path) + "/data/processed/combined/"
+DATA_PATH = str(codebase_path) + "/data/processed/combined/"
 try:
-    df_viz, var_plot, loc_to_plot, start_date_to_plot, end_date_to_plot = df_manip_plotting.df_creation(data_path)
-except:
-    print("Dataframe error")
-#print(df_viz.head())
+    (df_viz,
+     var_plot,
+     loc_to_plot,
+     start_date_to_plot,
+     end_date_to_plot) = df_manip_plotting.df_creation(DATA_PATH)
+except Exception as e:
+    logging.exception(e)
+    print("Unable to generate data based on these selections. \
+          Please update input or refresh the page.")
 try:
     # Choose between either chronological or annual comparison view
     data_comparison_type = st.radio(
@@ -62,4 +56,6 @@ try:
         df_manip_plotting.plot_it(an_fig, df_viz)
 # Since the goal is to capture all exceptions, this warning is disabled.
 except: # pylint: disable=bare-except
-    st.write(":red[Please fill in all configuration settings]")
+    st.write(":red[Unable to plot data]")
+    st.write("Please confirm data selections have been made.\
+             If all fields have been selected, data may not be available for these criteria.")
