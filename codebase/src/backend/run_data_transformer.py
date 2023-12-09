@@ -14,21 +14,22 @@ aggregate with the ichart data.
 Due to the large file size, we will only run this program once in order to generate the processed
 data. 
 """
+import os
+
+import pandas as pd
 
 from data_transformer import DataTransformer
-import pandas as pd
-import os 
 
 
-# # uncomment this section to run the data_transformer.py file for ichart data
-# # ichart
-# dataTransformer = DataTransformer()
-# dataTransformer.set_path("../../data/raw/ichart/pivot")
-# dataTransformer.set_devices(["Beach2_Tower", "Beach2_Buoy", "Beach6_Buoy", "TREC_Tower"])
-# dataTransformer.device_aggregate("ichart")
-# dataTransformer.tidy_devices("ichart")
-# dataTransformer.device_downsample_hour("ichart")
-# dataTransformer.device_downsample_day("ichart")
+# uncomment this section to run the data_transformer.py file for ichart data
+# ichart
+dataTransformer = DataTransformer()
+dataTransformer.set_path("../../data/raw/ichart/pivot")
+dataTransformer.set_devices(["Beach2_Tower", "Beach2_Buoy", "Beach6_Buoy", "TREC_Tower"])
+dataTransformer.device_aggregate("ichart")
+dataTransformer.tidy_devices("ichart")
+dataTransformer.device_downsample_hour("ichart")
+dataTransformer.device_downsample_day("ichart")
 
 
 
@@ -50,67 +51,96 @@ class DataWrangler:
         # the project names (also built into the file directory system)
         self.project = [ "new", "old"]
 
-    
+
     def downsample(self) -> None:
         """
-        This function
+        This function downsamples the data and puts it into tidy form. 
+        A seperate class and function had to be created because the data files
+        were too large to run data_transformer.py. This way, we downsample the 
+        data first, and then put it into tidy format before running data_combiner. 
 
         Arguments:
-
-        variable (type): description
+        None. This function will run through the raw data in the new and old projects
         
         Returns:
-        No returns, but writes 2 csv files to the processed directory.
+        No returns, but writes 2 downsampled files to the processed directory for
+        every project and device combination.
         
         Raises:
         -------
         
         """
+        # iterates through the old and new project directories.
         for project in self.project:
             for device in os.listdir(f"../../data/raw/{project}"):
-                # if device == "TREC_Tower_iSIC":
-                #     continue
-                # if device == "Beach2_Tower_iSIC":
-                #     continue
-                if device not in ["TREC_Tower_iSIC"]: #, "Beach2_Tower_iSIC"]:
-                    continue
-
                 for filename in os.listdir(f"../../data/raw/{project}/{device}"):
-                    print(device, filename)
+                    print("Downsampling: ", device, filename)
                     if filename.endswith(".csv"):
                         df = pd.read_csv(f"../../data/raw/{project}/{device}/{filename}")
+                        # removing any extra headers that happened to get appended
+                        # to the raw datafile (specifically any file for TREC_Tower)
                         df = df[df["times"] != "times"]
+                        # There was an issue with the raw TREC_Tower data. It was duplicated
+                        # and appended multiple times. This was due to a misshap when first
+                        # running the data_loader.py script. Due to the large number of api
+                        # calls we would have to make again to run the script, we decided to
+                        # work with what we have.
                         df.drop_duplicates(subset=['times'], inplace=True)
                         df.dropna(subset=['times'], inplace=True)
                         df.reset_index(inplace=True)
+
                         df["times"] = pd.to_datetime(df["times"])
                         df.drop(columns=["index"], inplace=True)
+
+                        # hard coded because of how data_loader is structured.
+                        # Ideally in version 2 of this software, this would be a
+                        # variable index that reads in the parameter we are looking for,
+                        # instead of hardcoding.
+
                         parameter = df.columns[1]
+
+                        # saving the parameter variable name for later and standardizing to "value"
                         df.rename(columns={parameter: 'value'}, inplace=True)
                         df.set_index("times", inplace=True)
                         df["value"] = df["value"].astype(float)
-                        hourly_df = df.groupby(["Units"]).resample('H').agg({"value": ["mean", "std"]})
-                        daily_df = df.groupby(["Units"]).resample('D').agg({"value": ["mean", "std"]})
+
+                        # downsampling by hour and by day
+                        hourly_df = df.groupby(["Units"]).resample('H').agg(
+                            {"value": ["mean", "std"]})
+                        daily_df = df.groupby(["Units"]).resample('D').agg(
+                            {"value": ["mean", "std"]})
                         hourly_df.reset_index(inplace=True)
                         daily_df.reset_index(inplace=True)
                         hourly_df.set_index("times", inplace=True)
                         daily_df.set_index("times", inplace=True)
                         hourly_df.reset_index(inplace=True)
                         daily_df.reset_index(inplace=True)
-                        hourly_df.columns = [col[0] if col[1] == '' else f"{col[0]}_{col[1]}" for col in hourly_df.columns]
-                        daily_df.columns = [col[0] if col[1] == '' else f"{col[0]}_{col[1]}" for col in daily_df.columns]
+
+                        # concatonating double headers to one single header.
+
+                        hourly_df.columns = [col[0] if col[1] == ''
+                                             else f"{col[0]}_{col[1]}" for col in hourly_df.columns]
+                        daily_df.columns = [col[0] if col[1] == ''
+                                            else f"{col[0]}_{col[1]}" for col in daily_df.columns]
                         hourly_df["parameter"] = parameter
                         daily_df["parameter"] = parameter
-        
+
                         #save the data to a csv file
-                        hourly_df.to_csv(f"../../data/processed/{project}/{device}/hourly_{filename}", index = False)
-                        daily_df.to_csv(f"../../data/processed/{project}/{device}/daily_{filename}", index = False)
+                        path = f"../../data/processed/{project}/{device}"
+                        hourly_df.to_csv(os.path.join(path, f"hourly_{filename}"), index = False)
+                        daily_df.to_csv(os.path.join(path, f"daily_{filename}"), index = False)
 
                 self.parser(f"../../data/processed/{project}/{device}")
-                    
+
 
 
     def parser(self, directory: str ) -> None:
+        """
+        This function is to combine all of the individual processed csvs 
+        we created from the function "downsample" above. This function's
+        output is one csv for all of the hourly data and one csv for all 
+        of the daily data for a given project and device.
+        """
         df_merged = pd.DataFrame()
         for filename in os.listdir(directory):
             if filename.endswith(".csv"):
