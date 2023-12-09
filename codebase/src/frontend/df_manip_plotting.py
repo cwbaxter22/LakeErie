@@ -1,4 +1,14 @@
-import os
+"""Manipulate and plot data from dataframes.
+
+Module contains 4 functions: 1 for dataframe manipulation, 3 for plotting.
+Dataframe manipulation is all encompassing should not need to be used with
+any other manipulation tools. Two of the plotting functions generate different figures,
+while the third is able to plot any scatter plot figure.
+
+"""
+
+# Notice the blank line above. Code should continue on this line."""
+
 import datetime
 import streamlit as st
 import pandas as pd
@@ -6,18 +16,23 @@ import plotly.express as px
 from plotly import graph_objects
 import numpy as np
 
-def df_creation(path_to_df: str):
+def df_creation(path_to_df: str) -> [pd.DataFrame(), str, list, str, str]:
     """
     Create dataframe using user-selected sites.
 
     Arguments:
     ----------
-    current_file_dir (str): current file directory
-    frequency (str): frequency of data
-
+    path_to_df (str): path to ../data/processed/combined/ folder within github
+    
     Returns:
     ----------
-    df_chosen_locs (df): df containing user selected sites
+    df_loc_time_selection (df): df containing user selected variables at chosen locations and times
+    variable_to_plot (str): scalar variable to be plotted against time
+    locations_to_graph (list): list of locations that are contained in the df
+    start_time (datetime): starting date and hour or just starting date \
+          (depending on frequency selection) of data collection. 
+    end_time (datetime): end date and hour or just end date \
+          (depending on frequency selection) of data collection.
 
     """
 
@@ -35,24 +50,35 @@ def df_creation(path_to_df: str):
     st.subheader("Select data locations")
     # Static list of data collection sites
     # Names of the csv files
-    LOCATIONS_UNFORMATTED = ["Beach2_Buoy", "Beach2_Tower", "Beach6_Buoy", "Trec_Tower"]
+    sites_csv_name = ["Beach2_Buoy",
+                             "Beach2_Tower",
+                             "Beach6_Buoy",
+                             "Near_Shore_Buoy",
+                             "Surface_Data",
+                             "Walnut_Creek",
+                             "Trec_Tower"]
     # Names of locations user can pick from
-    LOCATIONS_DISPLAY = ["Beach 2 Buoy", "Beach 2 Tower", "Beach 6 Buoy", "Trec Tower"]
+    sites_display_name = ["Beach 2 Buoy",
+                         "Beach 2 Tower",
+                         "Beach 6 Buoy",
+                         "Near Shore Buoy",
+                         "Surface Data",
+                         "Walnut Creek",
+                         "TREC Tower"]
     # Checkboxes for user to select collection sites
     locations_selected_display = st.multiselect(
         "Data collection sites",
-        LOCATIONS_DISPLAY,
-        default=LOCATIONS_DISPLAY[-1],
+        sites_display_name,
+        default=sites_display_name[-1],
     )
     # Create a new list of 1's and 0's
     # 1's index the desired location of the formatted location string
-    # in LOCATIONS_DISPLAY
-    indices = [x in locations_selected_display for x in LOCATIONS_DISPLAY]
+    # in sites_display_name
+    indices = [x in locations_selected_display for x in sites_display_name]
     # Index the array containing all  of the available csv names using
     # the previously generated index array such that the correct csv names are
     # selected.
-    locations_selected_call = np.asarray(LOCATIONS_UNFORMATTED)[np.asarray(indices).astype(bool)]
-
+    locations_selected_call = np.asarray(sites_csv_name)[np.asarray(indices).astype(bool)]
     # If the user has not chosen any locations,
     # return a blank df
     if len(locations_selected_call) == 0:
@@ -64,8 +90,7 @@ def df_creation(path_to_df: str):
                         + data_frequency) for loc in locations_selected_call]
         # Concatenate all of the dfs into one
         df_chosen_locs = pd.concat(map(pd.read_csv, df_dirs))
-    
-    # When user has not made a selection, display error message
+        # When user has not made a selection, display error message
     if df_chosen_locs.empty:
         st.write(":red[Please select a data collection site from the drop-down above]" )
     else:
@@ -78,11 +103,11 @@ def df_creation(path_to_df: str):
         # Sidebar hides the drop-down
         with st.sidebar:
             st.subheader("Configure data selection")
-            START_DATE = st.date_input("Choose start-date",
+            start_time = st.date_input("Choose start-date",
                                     min_value=datetime.date(2000, 1, 1),
                                     max_value=datetime.date(2023, 9, 1),
                                     value = datetime.date(2000, 1, 1))
-            END_DATE = st.date_input("Choose end-date",
+            end_time = st.date_input("Choose end-date",
                                     value = datetime.date(2023, 9, 1))
             locations_to_graph = st.multiselect('Choose desired locations',
                                                 locations_in_df,
@@ -92,15 +117,14 @@ def df_creation(path_to_df: str):
                                     index=0)
             # Create temporary dataframe based on date range
             # The mask creates a boolean vector to include only values within date range
-            time_mask = (df_chosen_locs['times'] > np.datetime64(START_DATE)) & \
-                        (df_chosen_locs['times'] <= np.datetime64(END_DATE))
+            time_mask = (df_chosen_locs['times'] > np.datetime64(start_time)) & \
+                        (df_chosen_locs['times'] <= np.datetime64(end_time))
             df_intime = df_chosen_locs.loc[time_mask]
             # Configure visualization dataframe (df_viz) to queried values
             df_loc_time_selection = df_intime.query(
                 "location == @locations_to_graph").query(
                     f"parameter=='{variable_to_plot}'")
-            #print(f"From in function {df_loc_time_selection.head()}")
-            return df_loc_time_selection, variable_to_plot, locations_to_graph, START_DATE, END_DATE
+            return df_loc_time_selection, variable_to_plot, locations_to_graph, start_time, end_time
 
 def create_all_time_fig(df_alltime: pd.DataFrame(),
                         graph_title: str,
