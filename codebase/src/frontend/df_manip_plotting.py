@@ -174,7 +174,6 @@ def create_all_time_fig(df_alltime: pd.DataFrame(),
         #We would need a row number within the selected data
         #May be a better option another way
     else:
-        print(df_figure_data.head())
         all_time_fig = px.scatter(df_figure_data,
                                   x = "times",
                                   y = "value_mean",
