@@ -100,9 +100,8 @@ def df_creation2(path_to_df: str) -> [pd.DataFrame(), str, list, str, str]:
                                     value = datetime.date(2000, 1, 1))
             end_time = st.date_input("Choose end-date",
                                     value = datetime.date(2023, 9, 1))
-            locations_to_graph = st.multiselect('Choose desired locations',
-                                                locations_in_df,
-                                                default=locations_in_df[0])
+            locations_to_graph = st.selectbox('Choose desired location',
+                                                locations_in_df)
             variable_to_plot = st.selectbox(label = "Choose a variable",
                                     options = variables_in_df,
                                     index=0)

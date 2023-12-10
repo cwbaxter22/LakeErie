@@ -25,3 +25,14 @@ df, var_plot, loc_to_plot, start_date_to_plot, end_date_to_plot = anomaly.df_cre
 fig = anomaly.create_trendline(df)
 st.plotly_chart(fig)
 
+st.title("Anomaly Detection Dashboard")
+st.write(
+    "This dashboard visualizes anomalies in the selected data based on user-defined parameters."
+)
+
+period = st.number_input("Enter Period value", value=1.5, step=0.1)
+IQR_alpha = st.number_input("Enter IQR alpha value", value=0.05, step=0.01)
+Clean_alpha = st.number_input("Enter Clean alpha value", value =.05, step = .01)
+fig2 = anomaly.create_anomaly_graph(df)
+st.plotly_chart(fig2)
+
