@@ -6,6 +6,8 @@ import pytimetk
 import plotly.io as pio
 import folium
 import pathlib
+from streamlit_folium import folium_static
+
 #from streamlit_folium import folium_static
 from frontend import df_manip_plotting
 from frontend import leaflet_map
@@ -21,6 +23,9 @@ st.title("Advanced Statistics") # Title for the streamlit app
 codebase_path = pathlib.Path(__file__).parents[2]
 data_path = str(codebase_path) + "/data/processed/combined/"
 df, var_plot, loc_to_plot, start_date_to_plot, end_date_to_plot = anomaly.df_creation2(data_path)
+
+folium_map = leaflet_map.map_main(loc_to_plot)
+folium_static(folium_map)
 
 ### Create time series trendline plot 
 st.title("Time series visualization with long term trend line")
