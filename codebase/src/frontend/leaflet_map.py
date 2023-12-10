@@ -16,16 +16,17 @@ def map_main(selected_buoy):
     """
 
     # Define the center of the map (for example, using the coordinates of Buoy 3)
-    center_latitude, center_longitude = 51.5074, -0.1278
+    center_latitude, center_longitude = 42.10992, -80.15459
 
     # Define the buoy locations
     buoy_locations = [
-    {"name": "Beach2_Buoy", "latitude": 40.7128, "longitude": -74.0060},
-    {"name": "Beach2_Tower", "latitude": 34.0522, "longitude": -118.2437},
-    {"name": "Beach6_Buoy", "latitude": 51.5074, "longitude": -0.1278},
-    {"name": "Near_Shore_Buoy", "latitude": 48.8566, "longitude": 2.3522},
-    {"name": "Walnut_Creek", "latitude": 55.7558, "longitude": 37.6176},
-    {"name": "TREC_Tower", "latitude": -33.8651, "longitude": 151.2093}
+    {"name": "Beach2_Buoy", "latitude": 42.15763, "longitude": -80.14044},
+    {"name": "Beach2_Tower", "latitude": 42.15381, "longitude": -80.13071},
+    {"name": "Beach6_Buoy", "latitude": 42.16363, "longitude": -80.12830},
+    {"name": "Near_Shore_Buoy", "latitude": 42.17890, "longitude": -80.12679},
+    {"name": "Walnut_Creek", "latitude": 42.13970, "longitude": -80.28418},
+    {"name": "Trec_Tower", "latitude": 42.10992, "longitude": -80.15459},
+    {"name": "Surface_Data", "latitude": 42.116952, "longitude": -80.149409},
     ]
     # Check if the selected buoy is in the predefined list
     buoy_names = [buoy["name"] for buoy in buoy_locations]
@@ -40,7 +41,7 @@ def map_main(selected_buoy):
                              "Latitude and longitude must be numeric.")
 
     # Create a map object using Folium
-    m = folium.Map(location=[center_latitude, center_longitude], zoom_start=13)
+    m = folium.Map(location=[center_latitude, center_longitude], zoom_start=11)
 
     # Add markers for each buoy
     for buoy in buoy_locations:
