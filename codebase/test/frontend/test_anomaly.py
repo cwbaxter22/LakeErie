@@ -1,7 +1,9 @@
 import unittest
 import importlib
 import pathlib
+
 import pandas as pd
+
 from datetime import datetime
 from matplotlib import pyplot as plt
 
@@ -60,6 +62,8 @@ class TestCreateTrendline(unittest.TestCase):
                              'value_mean': [10, 20, 30]})
         with self.assertRaises(TypeError):
             anomaly_mod.create_trendline(data)
+
+
 
 ###### 
 ### Tests for Anomaly Calculation Function
@@ -167,6 +171,88 @@ class TestCreateAnomalyGraph(unittest.TestCase):
         self.assertEqual(str(context.exception), expected_error_message)
 
 
-
+###### 
+### Tests for Anomaly decomposition Function
+##########
     
 
+class TestAnomalyDecomp(unittest.TestCase):
+    """Test cases for anomaly_decomp function"""
+
+    # Test with valid data, expecting no errors
+    def test_valid_data(self):
+        data = pd.DataFrame({
+            'times': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-05', '2023-01-06', '2023-01-07', '2023-01-08']),
+            'value_mean': [10, 20, 30, 40, 35, 25, 15, 22]
+        })
+        result = anomaly_mod.anomaly_decomp(data)
+        self.assertIsNotNone(result)
+
+    # Test TypeError is raised when data is not a pandas DataFrame
+    def test_non_dataframe_raises_type_error(self):
+        non_dataframe = "This is not a DataFrame"
+
+        with self.assertRaises(TypeError):
+            anomaly_mod.anomaly_decomp(non_dataframe)
+
+    # Test TypeError is raised when 'times' column is not a datetime object
+    def test_non_datetime_column(self):
+        data = pd.DataFrame({
+            'times': ['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-05', '2023-01-06', '2023-01-07', '2023-01-08'],
+            'value_mean': [1, 2, 3, 4, 5, 6, 7, 8]
+        })
+        with self.assertRaises(TypeError) as context:
+            anomaly_mod.anomaly_decomp(data)
+
+        expected_error_message = "The 'times' column must be of datetime type."
+        self.assertEqual(str(context.exception), expected_error_message)
+
+    # Test to ensure decomp is created
+    def test_decomp_created(self):
+        data = pd.DataFrame({
+            'times': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-05', '2023-01-06', '2023-01-07', '2023-01-08']),
+            'value_mean': [10, 20, 30, 40, 35, 25, 15, 22]
+        })
+        decomp = anomaly_mod.anomaly_decomp(data)
+
+        # Check if decomp is not None
+        self.assertIsNotNone(decomp)
+
+    # Test ValueError is raised when clean_alpha is non-numeric or zero
+    def test_invalid_clean_alpha_raises_value_error(self):
+        data = pd.DataFrame({
+            'times': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-05', '2023-01-06', '2023-01-07', '2023-01-08']),
+            'value_mean': [10, 20, 30, 40, 35, 25, 15, 22]
+        })
+
+        with self.assertRaises(ValueError) as context:
+            anomaly_mod.anomaly_decomp(data, clean_alpha=0)
+
+        expected_error_message = "clean_alpha must be a non-zero numeric value."
+        self.assertEqual(str(context.exception), expected_error_message)
+
+    # Test ValueError is raised when period is non-numeric or zero
+    def test_invalid_period_raises_value_error(self):
+        data = pd.DataFrame({
+            'times': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-05', '2023-01-06', '2023-01-07', '2023-01-08']),
+            'value_mean': [10, 20, 30, 40, 35, 25, 15, 22]
+        })
+
+        with self.assertRaises(ValueError) as context:
+            anomaly_mod.anomaly_decomp(data, period=0)
+
+        expected_error_message = "Period must be a non-zero numeric value."
+        self.assertEqual(str(context.exception), expected_error_message)
+
+    # Test ValueError is raised when clean_alpha is non-numeric or zero
+    def test_invalid_clean_alpha_raises_value_error(self):
+        data = pd.DataFrame({
+            'times': pd.to_datetime(['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-05', '2023-01-06', '2023-01-07', '2023-01-08']),
+            'value_mean': [10, 20, 30, 40, 35, 25, 15, 22]
+        })
+
+        with self.assertRaises(ValueError) as context:
+            anomaly_mod.anomaly_decomp(data, clean_alpha=0)
+
+        expected_error_message = "clean_alpha must be a non-zero numeric value."
+        self.assertEqual(str(context.exception), expected_error_message)

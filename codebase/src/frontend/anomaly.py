@@ -247,33 +247,31 @@ def anomaly_decomp(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
     Returns:
     - decomp: figure with statistical decomposition of anomaly calculation
 
-    Raises:
-    - ValueError: If 'data' is not a pandas DataFrame.
-    - ValueError: If 'times' column is not present in 'data'.
-    - ValueError: If 'value_mean' column is not present in 'data'.
-    - ValueError: If 'period' is not a positive integer.
-    - ValueError: If 'iqr_alpha' is not between 0 and 1.
-    - ValueError: If 'clean_alpha' is not between 0 and 1.
     """
-    
+    # Check if data is a DataFrame
     if not isinstance(data, pd.DataFrame):
-        raise ValueError("'data' must be a pandas DataFrame.")
-    
-    if 'times' not in data.columns:
-        raise ValueError("The 'times' column is not present in the data.")
-    
+        raise TypeError("Input data must be a pandas DataFrame.")
+
+    # Check if 'times' column exists and is of datetime type
+    if 'times' not in data.columns or not pd.api.types.is_datetime64_any_dtype(data['times']):
+        raise TypeError("The 'times' column must be of datetime type.")
+
+    # Check if 'value_mean' column exists
     if 'value_mean' not in data.columns:
-        raise ValueError("The 'value_mean' column is not present in the data.")
-    
-    if not isinstance(period, int) or period <= 0:
-        raise ValueError("'period' must be a positive integer.")
-    
-    if not (0 <= iqr_alpha <= 1):
-        raise ValueError("'iqr_alpha' must be between 0 and 1.")
-    
-    if not (0 <= clean_alpha <= 1):
-        raise ValueError("'clean_alpha' must be between 0 and 1.")
-    
+        raise ValueError("The 'value_mean' column is required in the input data.")
+
+    # Check if period is a non-zero numeric value
+    if not isinstance(period, (int, float)) or period <= 0:
+        raise ValueError("Period must be a non-zero numeric value.")
+
+    # Check if iqr_alpha is a non-zero numeric value
+    if not isinstance(iqr_alpha, (int, float)) or iqr_alpha <= 0:
+        raise ValueError("iqr_alpha must be a non-zero numeric value.")
+
+    # Check if clean_alpha is a non-zero numeric value
+    if not isinstance(clean_alpha, (int, float)) or clean_alpha <= 0:
+        raise ValueError("clean_alpha must be a non-zero numeric value.")
+
     data_cleaned = data.dropna(subset=['value_mean'])
 
     anomalize_df = pytimetk.anomalize(
@@ -286,6 +284,10 @@ def anomaly_decomp(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
         clean="min_max"
     )
 
+    # Check if 'anomalize_df' is not empty
+    if anomalize_df.empty:
+        raise ValueError("Anomalize result is empty.")
+
     decomp = pytimetk.plot_anomalies_decomp(
         data=anomalize_df,
         date_column='times',
@@ -294,5 +296,4 @@ def anomaly_decomp(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
     )
 
     return decomp
-
 #######
