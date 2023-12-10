@@ -6,22 +6,22 @@ This script requires that unittest and numpy be installed within the Python
 environment you run the module in. The src module must be available to import.
 
 This file can be run from the frontend/ directory using the command:
-'py -m unittest discover'. The module contains the following
-tests:
+'py -m unittest discover'. 
 
-    plot_it()
-    * smoke_test - confirm the function is able to run.
+Most tests are very basic as most work is performed by plotly (figure data cannot be indexed)
+Therefore, many tests were made for the df_creation() function, since it is the 
+'logic-heavy' portion of the code.
     
 """
+import datetime
 import importlib
 import unittest
 import pathlib
+import numpy as np
 import pandas as pd
 import plotly.express as px
-import datetime
 
 codebase_path = pathlib.Path(__file__).parents[2]
-
 #https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
 spec = importlib.util.spec_from_file_location(
     name='plotting_mod',  # name is not related to the file, it's the module name!
@@ -30,7 +30,6 @@ spec = importlib.util.spec_from_file_location(
 )
 df_manip_plotting_mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(df_manip_plotting_mod)
-
 
 class TestDFCreation(unittest.TestCase):
     '''DF creation: smoke (1), oneshot (2)
@@ -53,7 +52,6 @@ class TestDFCreation(unittest.TestCase):
         """
         try:
             df_manip_plotting_mod.df_creation(self.path_to_df)
-
         except RuntimeError:
             self.assertRaises(RuntimeError)
     def test_oneshot(self):
@@ -84,7 +82,7 @@ class TestDFCreation(unittest.TestCase):
 
             Arguments:
             ----------
-            col_names (list): list of potential column names for df
+            None
 
             Returns:
             ----------
@@ -103,6 +101,7 @@ class TestDFCreation(unittest.TestCase):
                 self.assertRaises(TypeError)
             if not (any(isinstance(i, (type(datetime.date)))) for i in [start_time, end_time]):
                 self.assertRaises(TypeError)
+
         # Column Name Tests
         # Column names should match what is in this list
         col_names_req = ["times", "parameter", "Units",
@@ -151,7 +150,7 @@ class TestDFCreation(unittest.TestCase):
             # Not a path at all, raise error
             test_folder_check(5)
 class TestCreateAllTimeFig(unittest.TestCase):
-    '''All time figure testing: smoke (1)'''
+    '''All time figure: smoke (1), edge test (1)'''
     def test_smoke(self):
         """
         Generate an arbitrary all-time figure.
@@ -177,9 +176,31 @@ class TestCreateAllTimeFig(unittest.TestCase):
                                                )
         except RuntimeError:
             self.assertRaises(RuntimeError)
+    def test_edge_test(self):
+        """
+        Time must be in pd datetime format
 
+        """
+        d = {'parameter': ['Air_Temp', 'Air_Temp', 'Air_Temp'],
+                'value_mean': [1.0, 1.1, 1.2],
+                'value_std': [0, 1, 2],
+                'location': ['trec', 'trec', 'trec'],
+                'Units' : ['F', 'F', 'F'],
+                'times' : (['2008-05-20', '2008-05-21', '2008-05-22'])}
+        df = pd.DataFrame(data=d)
+        try:
+            df_manip_plotting_mod.create_all_time_fig(df,
+                                                'Test Title',
+                                                'value_mean',
+                                                1,
+                                                'trec',
+                                                pd.to_datetime('2008-05-20'),
+                                                pd.to_datetime('2008-05-22')
+                                                )
+        except (Exception,):
+            self.assertRaises(TypeError)
 class TestAnnualComparisonFig(unittest.TestCase):
-    '''Annual Comparison figure testing: smoke (1)'''
+    '''Annual Comparison figure: smoke (1), edge (1)'''
     def test_smoke(self):
         """
         Generate an arbitrary annual comparison figure.
@@ -204,9 +225,33 @@ class TestAnnualComparisonFig(unittest.TestCase):
                                                )
         except RuntimeError:
             self.assertRaises(RuntimeError)
-
+    def test_edge_test(self):
+        """
+        Dates must be in pd datetime format for function to run
+        """
+        try:
+            d = {'parameter': ['Air_Temp', 'Air_Temp', 'Air_Temp'],
+                 'value_mean': [1.0, 1.1, 1.2],
+                 'value_std': [0, 1, 2],
+                 'location': ['trec', 'trec', 'trec'],
+                 'Units' : ['F', 'F', 'F'],
+                 'times' : (['2008-05-20', '2008-05-21', '2008-05-22'])}
+            df = pd.DataFrame(data=d)
+            df_manip_plotting_mod.create_annual_comparison_fig(df,
+                                               'Test Title',
+                                               'value_mean',
+                                               1,
+                                               'trec'
+                                               )
+        except (Exception,):
+            self.assertRaises(TypeError)
 class TestPlotIt(unittest.TestCase):
-    '''Plotter testing: smoke (1)'''
+    '''
+    Plotter function: smoke (1), edge (1)
+
+    This is a simple function that is just called to format plots.
+    Nothing is returned and it requires only minimal testing.
+    '''
     def test_smoke(self):
         """
         The plot function generates a figure using simple, arbitrary scatter plot
@@ -220,6 +265,15 @@ class TestPlotIt(unittest.TestCase):
             df_manip_plotting_mod.plot_it(fig, df)
         except RuntimeError:
             self.assertRaises(RuntimeError)
+    def test_edge(self):
+        """
+        Function should not work for things that are of the incorrect type
+        """
+        not_a_figure = np.ones((100, 100))
+        d = {'col1': [1, 2], 'col2': [3, 4]}
+        df = pd.DataFrame(data=d)
+        with self.assertRaises(AttributeError):
+            df_manip_plotting_mod.plot_it(not_a_figure, df)
 
 if __name__ == '__main__':
     unittest.main()

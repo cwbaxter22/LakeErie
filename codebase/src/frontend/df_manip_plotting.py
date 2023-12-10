@@ -7,8 +7,6 @@ while the third is able to plot any scatter plot figure.
 
 """
 
-# Notice the blank line above. Code should continue on this line."""
-
 import datetime
 import streamlit as st
 import pandas as pd
