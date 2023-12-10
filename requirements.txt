@@ -38,7 +38,7 @@ scipy==1.11.4
 smmap==5.0.1
 statsmodels==0.14.0
 streamlit==1.29.0
-streamlit_folium
+streamlit-folium==0.17.3
 
 tenacity==8.2.3
 toml==0.10.2
