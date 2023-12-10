@@ -18,6 +18,7 @@ import unittest
 import pathlib
 import pandas as pd
 import plotly.express as px
+import datetime
 
 codebase_path = pathlib.Path(__file__).parents[2]
 
@@ -32,7 +33,17 @@ spec.loader.exec_module(df_manip_plotting_mod)
 
 
 class TestDFCreation(unittest.TestCase):
-    '''DF creation: smoke (1)'''
+    '''DF creation: smoke (1), oneshot (2)
+    
+    Path to df defined in initialization,
+    If folder is moved, most tests will fail.'''
+    def __init__(self, methodName: str = "runTest") -> None:
+        """
+        Initialization
+        """
+        super().__init__(methodName)
+        codebase_folder_path = pathlib.Path(__file__).parents[2]
+        self.path_to_df = str(codebase_folder_path) + "/data/processed/combined/"
     def test_smoke(self):
         """
         Passing the path to the combined data folder generates a dataframe.
@@ -41,23 +52,104 @@ class TestDFCreation(unittest.TestCase):
 
         """
         try:
-            codebase_folder_path = pathlib.Path(__file__).parents[2]
-            path_to_df = str(codebase_folder_path) + "/data/processed/combined/"
-            df_manip_plotting_mod.df_creation(path_to_df)
-        except RuntimeError:
-            self.assertRaises(RuntimeError)
-    def test_oneshot_columnnames(self):
-        """
-        **Come back to this tomorrow.
-        Confirm the dataframe columns are correct 
+            df_manip_plotting_mod.df_creation(self.path_to_df)
 
-        """
-        try:
-            codebase_folder_path = pathlib.Path(__file__).parents[2]
-            path_to_df = str(codebase_folder_path) + "/data/processed/combined/"
-            df_manip_plotting_mod.df_creation(path_to_df)
         except RuntimeError:
             self.assertRaises(RuntimeError)
+    def test_oneshot(self):
+        """
+        Check column names and function return types
+        """
+        def test_column_names(col_names: list) -> None:
+            """
+            Column names are correct
+
+            Arguments:
+            ----------
+            col_names (list): list of potential column names for df
+
+            Returns:
+            ----------
+            None: check performed in function 
+
+            """
+            (df_viz, _, _, _, _) = df_manip_plotting_mod.df_creation(self.path_to_df)
+            col_names_curr = list(df_viz.columns)
+
+            match_check = set(col_names_curr).issubset(col_names)
+            self.assertTrue(match_check)
+        def test_output_type() -> None:
+            """
+            Variables returned are correct type
+
+            Arguments:
+            ----------
+            col_names (list): list of potential column names for df
+
+            Returns:
+            ----------
+            None: check performed in function 
+
+            """
+            (df_loc_time_selection,
+                variable_to_plot,
+                locations_to_graph,
+                start_time, end_time) = df_manip_plotting_mod.df_creation(self.path_to_df)
+            if not isinstance(df_loc_time_selection, (type(pd.DataFrame()))):
+                self.assertRaises(TypeError)
+            if not isinstance(variable_to_plot, (str)):
+                self.assertRaises(TypeError)
+            if not isinstance(locations_to_graph, (str, list)):
+                self.assertRaises(TypeError)
+            if not (any(isinstance(i, (type(datetime.date)))) for i in [start_time, end_time]):
+                self.assertRaises(TypeError)
+        # Column Name Tests
+        # Column names should match what is in this list
+        col_names_req = ["times", "parameter", "Units",
+                         "value_mean", "value_std", "location"]
+        test_column_names(col_names_req)
+        # Column names should match this list as well, order does not matter
+        col_names_req_alt = ["parameter", "Units", "value_mean",
+                             "value_std", "location", "times"]
+        test_column_names(col_names_req_alt)
+        # Column names should not match this list because 'times' should not be capitalized
+        incorrect_column_names = ["Times", "parameter", "Units",
+                                "value_mean", "value_std", "location"]
+        # Column names should not match this list because these are the names of the Seven Dwarves
+        the_seven_dwarves = ["Dopey", "Doc", "Bashful",
+                             "Sneezy", "Happy", "Grumpy",
+                             "Sleepy"]
+        with self.assertRaises(AssertionError):
+            test_column_names(incorrect_column_names)
+            test_column_names(the_seven_dwarves)
+        # Output type tests
+        # General check to ensure all output is of the correct type
+        test_output_type()
+    def test_edge(self):
+        """
+        Check folder address is correct
+        """
+        def test_folder_check(folder_location:str) -> None:
+            """
+            Location of folder is correct
+
+            Arguments:
+            ----------
+            folder_location (str): Path to try to open dataframe
+
+            Returns:
+            ----------
+            None: check performed in function 
+
+            """
+            self.assertTrue(self.path_to_df == folder_location)
+            # Edge tests
+            # Correct path should not create an error
+        with self.assertRaises(AssertionError):
+            # Incorrect path raise error
+            test_folder_check("../A/Madeup/Folder")
+            # Not a path at all, raise error
+            test_folder_check(5)
 class TestCreateAllTimeFig(unittest.TestCase):
     '''All time figure testing: smoke (1)'''
     def test_smoke(self):
