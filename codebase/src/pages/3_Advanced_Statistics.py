@@ -6,67 +6,72 @@ import pytimetk
 import plotly.io as pio
 import folium
 import pathlib
+from streamlit_folium import folium_static
+
 #from streamlit_folium import folium_static
 from frontend import df_manip_plotting
 from frontend import leaflet_map
 from frontend import anomaly
 
+
 # Configure the page 
 st.set_page_config(page_title="Advanced Statistics", layout="wide")
 st.title("Advanced Statistics") # Title for the streamlit app
 
-# Drop down menu for location
-#selected_location = st.selectbox("Select Location", ["TREQ Station", "Bay Bouy", "Beach 2 Tower", "Beach 2 Bouy", "Beach 6 Bouy", "Nearshore Bouy", "Walnut Creek Bouy"])
-
+#### Bring in and filter the data frame based on user defined preferences 
 # Relative path to /pages
 codebase_path = pathlib.Path(__file__).parents[2]
 data_path = str(codebase_path) + "/data/processed/combined/"
-df, var_plot, loc_to_plot, start_date_to_plot, end_date_to_plot = df_manip_plotting.df_creation(data_path)
+df, var_plot, loc_to_plot, start_date_to_plot, end_date_to_plot = anomaly.df_creation2(data_path)
 
-# Call your function to create the Leaflet map
-leaflet_map_current = leaflet_map.map_main(loc_to_plot)
+folium_map = leaflet_map.map_main(loc_to_plot)
+folium_static(folium_map)
 
-# Display the Leaflet map using st.markdown
-st.markdown(folium_static(leaflet_map_current), unsafe_allow_html=True)
+### Create time series trendline plot 
+st.title("Time series visualization with long term trend line")
+st.write(
+    "This dashboard displays long term data as well as a long term trendline. "
+)
 
-### HARD CODE TO BRING IN THE DATA 
-#file_path = "/Users/benjaminmakhlouf/Downloads/daily_tidy_all_data.csv"
-#df = pd.read_csv(file_path)
-
-## go the directory name 
-dirname = os.path.dirname(__file__)
-
-# Set location to correct frequency csv
-#if frequency_selected == "Daily":
-#    df = df_creation(dirname, "/daily_tidy_all_data.csv")
-#else:
-#    df = df_creation(dirname, "/hourly_tidy_all_data.csv")
-
-
-### DOUBLE CHECK 
-df['times'] = pd.to_datetime(df['times'])  # make sure times are in datetime
-df['value_mean'] = pd.to_numeric(df['value_mean'])  # make sure value_mean is numeric
-
-# Drop down menu for the user to choose the selected parameter, stored in selected_parameter 
-selected_parameter = st.selectbox("Select Parameter", ["Air_Temperature", "Barometric_Pressure", "Daily_Rain"])
-
-selected_parameter = "Air_Temperature"
-print(df)
-
-# create a new data frame that is the new selected parameter only 
-df_param = df[df['parameter'] == selected_parameter]
-
-print(df_param)
-# Call the create_trendline function to create the trendline figure 
-fig = anomaly.create_trendline(df_param)
-
-# pio.show(fig)
+fig = anomaly.create_trendline(df)
 st.plotly_chart(fig)
 
-fig2 = anomaly.create_anomaly_graph(df_param)
+if st.button("Show Selected Data"):
+    # If the button is clicked, display the selected data frame
+    st.write("Selected Data:")
+    st.write(df)
 
+
+st.title("Anomaly Detection Dashboard")
+st.write(
+    "This dashboard visualizes anomalies in the selected data. "
+    "Adjust parameters to change the anomaly calculation."
+)
+
+# Parameter Descriptions
+st.markdown(''':blue[Period: add description about what this is here]''')
+
+period = st.number_input("Enter Period value", value=7, step=1)
+
+st.markdown(''':blue[IQR alpha: add description about what this is here]''')
+IQR_alpha = st.number_input("Enter IQR alpha value", value=0.05, step=0.01)
+
+st.markdown(''':blue[Clean alpha: add description about what this is here]''')
+Clean_alpha = st.number_input("Enter Clean alpha value", value=0.75, step=0.1)
+
+
+#Create figure 2 , the anomaly detection. 
+fig2 = anomaly.create_anomaly_graph(df,period,IQR_alpha,Clean_alpha)
 st.plotly_chart(fig2)
 
-dec = anomaly.anomaly_decomp(df_param)
+if st.button("Show Statistical Decomposition"):
+    # If the button is clicked, display Figure 3
+    st.title("Statistical decomposition of time series statistics")
+    st.write("add description here about what these graphs mean ")
+    st.markdown(''':blue[*Observed*: add description here]''')
+    st.markdown(''':blue[*Trend*: add description here]''')
+    st.markdown(''':blue[*Seasonal*: add description here]''')
+    st.markdown(''':blue[*Residual*: add description here]''')
+    fig3 = anomaly.anomaly_decomp(df,period,IQR_alpha,Clean_alpha)
+    st.plotly_chart(fig3)
 
-st.plotly_chart(dec)

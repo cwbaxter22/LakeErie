@@ -3,6 +3,118 @@
 import pandas as pd
 import plotly.io as pio
 import pytimetk
+import streamlit as st
+import datetime
+import numpy as np
+#### 
+
+def df_creation2(path_to_df: str) -> [pd.DataFrame(), str, list, str, str]:
+    """
+    Create dataframe using user-selected sites.
+
+    Arguments:
+    ----------
+    path_to_df (str): path to ../data/processed/combined/ folder within github
+    
+    Returns:
+    ----------
+    df_loc_time_selection (df): df containing user selected variables at chosen locations and times
+    variable_to_plot (str): scalar variable to be plotted against time
+    locations_to_graph (list): list of locations that are contained in the df
+    start_time (datetime): starting date and hour or just starting date \
+          (depending on frequency selection) of data collection. 
+    end_time (datetime): end date and hour or just end date \
+          (depending on frequency selection) of data collection.
+
+    """
+
+    frequency_selected = st.radio(
+        "Select data interval",
+        ["Hourly", "Daily"],
+        index=1
+    )
+    # Set location to correct frequency csv
+    if frequency_selected == "Daily":
+        data_frequency = "/daily_data.csv"
+    else:
+        data_frequency = "/hourly_data.csv"
+    #Hourly or daily choice - default is daily
+    st.subheader("Select data locations")
+    # Static list of data collection sites
+    # Names of the csv files
+    sites_csv_name = ["Beach2_Buoy",
+                             "Beach2_Tower",
+                             "Beach6_Buoy",
+                             "Near_Shore_Buoy",
+                             "Surface_Data",
+                             "Walnut_Creek",
+                             "Trec_Tower"]
+    # Names of locations user can pick from
+    sites_display_name = ["Beach 2 Buoy",
+                         "Beach 2 Tower",
+                         "Beach 6 Buoy",
+                         "Near Shore Buoy",
+                         "Surface Data",
+                         "Walnut Creek",
+                         "TREC Tower"]
+    # Checkboxes for user to select collection sites
+    locations_selected_display = st.selectbox(
+        "Data collection sites",
+        sites_display_name
+    )
+    # Create a new list of 1's and 0's
+    # 1's index the desired location of the formatted location string
+    # in sites_display_name
+    indices = [x in locations_selected_display for x in sites_display_name]
+    # Index the array containing all  of the available csv names using
+    # the previously generated index array such that the correct csv names are
+    # selected.
+    locations_selected_call = np.asarray(sites_csv_name)[np.asarray(indices).astype(bool)]
+    # If the user has not chosen any locations,
+    # return a blank df
+    if len(locations_selected_call) == 0:
+        df_chosen_locs = pd.DataFrame()
+        return df_chosen_locs
+    else:
+        # List comprehension to create list of paths to needed dataframes
+        df_dirs = [(path_to_df + loc
+                        + data_frequency) for loc in locations_selected_call]
+        # Concatenate all of the dfs into one
+        df_chosen_locs = pd.concat(map(pd.read_csv, df_dirs))
+        # When user has not made a selection, display error message
+    if df_chosen_locs.empty:
+        st.write(":red[Please select a data collection site from the drop-down above]" )
+    else:
+        #Convert time column to datetime
+        df_chosen_locs['times'] = pd.to_datetime(df_chosen_locs['times'])
+        # List of all weather station locations
+        locations_in_df = list(df_chosen_locs['location'].unique())
+        # List of all variable types
+        variables_in_df = list(df_chosen_locs['parameter'].unique())
+        # Sidebar hides the drop-down
+        with st.sidebar:
+            st.subheader("Configure data selection")
+            start_time = st.date_input("Choose start-date",
+                                    min_value=datetime.date(2000, 1, 1),
+                                    max_value=datetime.date(2023, 9, 1),
+                                    value = datetime.date(2000, 1, 1))
+            end_time = st.date_input("Choose end-date",
+                                    value = datetime.date(2023, 9, 1))
+            locations_to_graph = st.selectbox('Choose desired location',
+                                                locations_in_df)
+            variable_to_plot = st.selectbox(label = "Choose a variable",
+                                    options = variables_in_df,
+                                    index=0)
+            # Create temporary dataframe based on date range
+            # The mask creates a boolean vector to include only values within date range
+            time_mask = (df_chosen_locs['times'] > np.datetime64(start_time)) & \
+                        (df_chosen_locs['times'] <= np.datetime64(end_time))
+            df_intime = df_chosen_locs.loc[time_mask]
+            # Configure visualization dataframe (df_viz) to queried values
+            df_loc_time_selection = df_intime.query(
+                "location == @locations_to_graph").query(
+                    f"parameter=='{variable_to_plot}'")
+            return df_loc_time_selection, variable_to_plot, locations_to_graph, start_time, end_time
 
 #######################################################################################################
 ##### Function to create the time series trendline 
@@ -37,9 +149,6 @@ def create_trendline(data):
     
     if 'value_mean' not in data.columns:
         raise ValueError("The 'value_mean' column is not present in the data.")
-    
-    if data['times'].count() < 3 or data['value_mean'].count() < 3:
-        raise ValueError("Each column must have at least 3 non-0 or non-NA values.")
     
     if not pd.api.types.is_datetime64_any_dtype(data['times']):
         raise ValueError("The 'times' column must be a datetime object.")
