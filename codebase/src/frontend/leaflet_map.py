@@ -20,14 +20,13 @@ def map_main(selected_buoy):
 
     # Define the buoy locations
     buoy_locations = [
-        {"name": "Buoy 1", "latitude": 40.7128, "longitude": -74.0060},
-        {"name": "Buoy 2", "latitude": 34.0522, "longitude": -118.2437},
-        {"name": "Buoy 3", "latitude": 51.5074, "longitude": -0.1278},
-        {"name": "Buoy 4", "latitude": 48.8566, "longitude": 2.3522},
-        {"name": "Buoy 5", "latitude": 55.7558, "longitude": 37.6176},
-        {"name": "Buoy 6", "latitude": -33.8651, "longitude": 151.2093}
+    {"name": "Beach2_Buoy", "latitude": 40.7128, "longitude": -74.0060},
+    {"name": "Beach2_Tower", "latitude": 34.0522, "longitude": -118.2437},
+    {"name": "Beach6_Buoy", "latitude": 51.5074, "longitude": -0.1278},
+    {"name": "Near_Shore_Buoy", "latitude": 48.8566, "longitude": 2.3522},
+    {"name": "Walnut_Creek", "latitude": 55.7558, "longitude": 37.6176},
+    {"name": "TREC_Tower", "latitude": -33.8651, "longitude": 151.2093}
     ]
-
     # Check if the selected buoy is in the predefined list
     buoy_names = [buoy["name"] for buoy in buoy_locations]
     if selected_buoy not in buoy_names:
@@ -49,4 +48,6 @@ def map_main(selected_buoy):
         folium.Marker([buoy["latitude"], buoy["longitude"]],
                       popup=buoy["name"], icon=folium.Icon(color=color)).add_to(m)
 
+    folium.TileLayer('cartodbdark_matter').add_to(m)
+    
     return m

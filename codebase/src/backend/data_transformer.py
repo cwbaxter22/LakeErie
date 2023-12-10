@@ -61,6 +61,10 @@ class DataTransformer():
 
     # need to add the default to get.devices from zac's code
     def set_devices(self, devices: list) -> None:
+        """
+        Users set the devices they want to iterate through. 
+        Use with the run_data_transformer for best results. 
+        """
         self.devices = devices
 
     def across_parameter_aggregate(self, device_name: str, project: str) -> None:
@@ -166,7 +170,7 @@ class DataTransformer():
         """
         #melts the dataframe into a tidy.format
         df = df.melt(id_vars=["times", "Units"], var_name="parameter", value_name="value")
- 
+
         #cleaning functions:
         #changing the times to pandas datetime format
         df["times"] = pd.to_datetime(df["times"])
@@ -228,7 +232,7 @@ class DataTransformer():
         hourly_df.reset_index(inplace=True)
 
         #combine multiindex columns into one column
-        hourly_df.columns = [col[0] if col[1] == '' 
+        hourly_df.columns = [col[0] if col[1] == ''
                              else f"{col[0]}_{col[1]}" for col in hourly_df.columns]
 
         #save the data to a csv file
