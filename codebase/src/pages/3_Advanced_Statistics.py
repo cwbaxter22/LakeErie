@@ -31,14 +31,29 @@ st.write(
 fig = anomaly.create_trendline(df)
 st.plotly_chart(fig)
 
+if st.button("Show Selected Data"):
+    # If the button is clicked, display the selected data frame
+    st.write("Selected Data:")
+    st.write(df)
+
+
 st.title("Anomaly Detection Dashboard")
 st.write(
-    "This dashboard visualizes anomalies in the selected data based on user-defined parameters."
+    "This dashboard visualizes anomalies in the selected data. "
+    "Adjust parameters to change the anomaly calculation."
 )
 
+# Parameter Descriptions
+st.markdown(''':blue[Period: add description about what this is here]''')
+
 period = st.number_input("Enter Period value", value=7, step=1)
+
+st.markdown(''':blue[IQR alpha: add description about what this is here]''')
 IQR_alpha = st.number_input("Enter IQR alpha value", value=0.05, step=0.01)
-Clean_alpha = st.number_input("Enter Clean alpha value", value =.75, step = .1)
+
+st.markdown(''':blue[Clean alpha: add description about what this is here]''')
+Clean_alpha = st.number_input("Enter Clean alpha value", value=0.75, step=0.1)
+
 
 #Create figure 2 , the anomaly detection. 
 fig2 = anomaly.create_anomaly_graph(df,period,IQR_alpha,Clean_alpha)
@@ -48,10 +63,10 @@ if st.button("Show Statistical Decomposition"):
     # If the button is clicked, display Figure 3
     st.title("Statistical decomposition of time series statistics")
     st.write("add description here about what these graphs mean ")
-    fig3 = anomaly.anomaly_decomp(df)
+    st.markdown(''':blue[*Observed*: add description here]''')
+    st.markdown(''':blue[*Trend*: add description here]''')
+    st.markdown(''':blue[*Seasonal*: add description here]''')
+    st.markdown(''':blue[*Residual*: add description here]''')
+    fig3 = anomaly.anomaly_decomp(df,period,IQR_alpha,Clean_alpha)
     st.plotly_chart(fig3)
 
-if st.button("Show Selected Data"):
-    # If the button is clicked, display the selected data frame
-    st.write("Selected Data:")
-    st.write(df)
