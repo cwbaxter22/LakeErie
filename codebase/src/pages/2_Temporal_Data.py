@@ -25,7 +25,7 @@ try:
      end_date_to_plot) = df_manip_plotting.df_creation(DATA_PATH)
 except Exception as e:
     logging.exception(e)
-    print("Unable to generate data based on these selections. \
+    st.write("Unable to generate data based on these selections. \
           Please update input or refresh the page.")
 try:
     # Choose between either chronological or annual comparison view
