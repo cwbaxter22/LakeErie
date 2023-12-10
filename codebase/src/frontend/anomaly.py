@@ -142,7 +142,7 @@ def create_trendline(data):
     """
     
     if not isinstance(data, pd.DataFrame):
-        raise ValueError("'data' must be a pandas DataFrame.")
+        raise TypeError("'data' must be a pandas DataFrame.")
     
     if 'times' not in data.columns:
         raise ValueError("The 'times' column is not present in the data.")
@@ -151,7 +151,7 @@ def create_trendline(data):
         raise ValueError("The 'value_mean' column is not present in the data.")
     
     if not pd.api.types.is_datetime64_any_dtype(data['times']):
-        raise ValueError("The 'times' column must be a datetime object.")
+        raise TypeError("The 'times' column must be a datetime object.")
     
     fig = pytimetk.plot_timeseries(
         data=data,
