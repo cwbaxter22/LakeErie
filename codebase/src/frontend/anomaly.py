@@ -185,36 +185,25 @@ def create_anomaly_graph(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
     Returns:
     - anom_plot: Depends on the plotting engine used (e.g., plotly figure).
 
-    Raises:
-    - ValueError: If 'data' is not a pandas DataFrame.
-    - ValueError: If 'times' column is not present in 'data'.
-    - ValueError: If 'value_mean' column is not present in 'data'.
-    - ValueError: If 'data' contains NaN values in the 'value_mean' column.
-    - ValueError: If 'period' is not a positive integer.
-    - ValueError: If 'iqr_alpha' is not between 0 and 1.
-    - ValueError: If 'clean_alpha' is not between 0 and 1.
-    - ImportError: If pytimetk is not installed.
-
 """
+    if len(data) <= period:
+        raise ValueError("Data must be longer than the selected Period value.")
+    
+    if not pd.api.types.is_datetime64_any_dtype(data['times']):
+        raise TypeError("'times' column must be a datetime object.")
+    
     if not isinstance(data, pd.DataFrame):
-        raise ValueError("'data' must be a pandas DataFrame.")
+        raise TypeError("Input data must be a pandas DataFrame.")
     
-    if 'times' not in data.columns:
-        raise ValueError("The 'times' column is not present in the data.")
+    if not isinstance(period, (int, float)) or period <= 0:
+        raise ValueError("Period must be a non-zero numeric value.")
     
-    if 'value_mean' not in data.columns:
-        raise ValueError("The 'value_mean' column is not present in the data.")
+    if not isinstance(iqr_alpha, (int, float)) or iqr_alpha <= 0:
+        raise ValueError("iqr_alpha must be a non-zero numeric value.")
     
-    if not isinstance(period, int) or period <= 0:
-        raise ValueError("'period' must be a positive integer.")
+    if not isinstance(clean_alpha, (int, float)) or clean_alpha <= 0:
+        raise ValueError("clean_alpha must be a non-zero numeric value.")
     
-    if not (0 <= iqr_alpha <= 1):
-        raise ValueError("'iqr_alpha' must be between 0 and 1.")
-    
-    if not (0 <= clean_alpha <= 1):
-        raise ValueError("'clean_alpha' must be between 0 and 1.")
-    
-
     data_cleaned = data.dropna(subset=['value_mean'])
 
     anomalize_df = pytimetk.anomalize(
