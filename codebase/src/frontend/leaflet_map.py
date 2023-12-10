@@ -1,4 +1,5 @@
-import folium 
+import folium
+
 
 def map_main(selected_buoy):
     """
@@ -20,14 +21,15 @@ def map_main(selected_buoy):
 
     # Define the buoy locations
     buoy_locations = [
-    {"name": "Beach2_Buoy", "latitude": 42.15763, "longitude": -80.14044},
-    {"name": "Beach2_Tower", "latitude": 42.15381, "longitude": -80.13071},
-    {"name": "Beach6_Buoy", "latitude": 42.16363, "longitude": -80.12830},
-    {"name": "Near_Shore_Buoy", "latitude": 42.17890, "longitude": -80.12679},
-    {"name": "Walnut_Creek", "latitude": 42.13970, "longitude": -80.28418},
-    {"name": "Trec_Tower", "latitude": 42.10992, "longitude": -80.15459},
-    {"name": "Surface_Data", "latitude": 42.116952, "longitude": -80.149409},
+        {"name": "Beach2_Buoy", "latitude": 42.15763, "longitude": -80.14044},
+        {"name": "Beach2_Tower", "latitude": 42.15381, "longitude": -80.13071},
+        {"name": "Beach6_Buoy", "latitude": 42.16363, "longitude": -80.12830},
+        {"name": "Near_Shore_Buoy", "latitude": 42.17890, "longitude": -80.12679},
+        {"name": "Walnut_Creek", "latitude": 42.13970, "longitude": -80.28418},
+        {"name": "Trec_Tower", "latitude": 42.10992, "longitude": -80.15459},
+        {"name": "Surface_Data", "latitude": 42.116952, "longitude": -80.149409},
     ]
+
     # Check if the selected buoy is in the predefined list
     buoy_names = [buoy["name"] for buoy in buoy_locations]
     if selected_buoy not in buoy_names:
@@ -41,14 +43,14 @@ def map_main(selected_buoy):
                              "Latitude and longitude must be numeric.")
 
     # Create a map object using Folium
-    m = folium.Map(location=[center_latitude, center_longitude], zoom_start=11)
+    buoy_map = folium.Map(location=[center_latitude, center_longitude], zoom_start=11)
 
     # Add markers for each buoy
     for buoy in buoy_locations:
         color = "red" if buoy["name"] == selected_buoy else "gray"
         folium.Marker([buoy["latitude"], buoy["longitude"]],
-                      popup=buoy["name"], icon=folium.Icon(color=color)).add_to(m)
+                      popup=buoy["name"], icon=folium.Icon(color=color)).add_to(buoy_map)
 
-    folium.TileLayer('cartodbdark_matter').add_to(m)
-    
-    return m
+    folium.TileLayer('cartodbdark_matter').add_to(buoy_map)
+
+    return buoy_map
