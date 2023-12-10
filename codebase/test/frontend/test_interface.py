@@ -102,6 +102,24 @@ class TestDFCreation(unittest.TestCase):
             if not (any(isinstance(i, (type(datetime.date)))) for i in [start_time, end_time]):
                 self.assertRaises(TypeError)
 
+        def test_test_data():
+            """
+            Test data has 7 for value corresponding to all Air_Temperature value
+            Therefore, output of column subsection average should be 7
+            """
+            codebase_folder_path = pathlib.Path(__file__).parents[1]
+            path_to_test_data = str(codebase_folder_path) + "/testdata/"
+            (df_loc_time_selection,
+                variable_to_plot,
+                locations_to_graph,
+                _, _) = df_manip_plotting_mod.df_creation(path_to_test_data)
+            df_curr_variable = df_loc_time_selection.query(
+                f"location=={locations_to_graph}").query(
+                    f"parameter=='{variable_to_plot}'")
+            col_average = df_curr_variable['value_mean'].mean()
+            self.assertAlmostEqual(col_average, 7)
+        test_test_data()
+
         # Column Name Tests
         # Column names should match what is in this list
         col_names_req = ["times", "parameter", "Units",
