@@ -110,7 +110,7 @@ class DataCombiner():
         """
 
         # Run for hourly data
-        for name, all_device in COMBINE_MAP.items():
+        for name, all_device in self.map.items():
             combined_df = []
             for proj, prod_device in zip(["ichart", "old", "new"], all_device):
                 # Skip in
