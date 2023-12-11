@@ -49,14 +49,22 @@ st.write(
 )
 
 # Parameter Descriptions
-st.markdown(''':blue[Period: add description about what this is here]''')
+st.markdown(''':blue[Period: The period is the window size for analyzing anomalies. 
+                This value should be adjusted to represent an appropriate time period 
+                for analyzing your data based on the amount of time selected to be analyzed]''')
 
 period = st.number_input("Enter Period value", value=7, step=1)
 
-st.markdown(''':blue[IQR alpha: add description about what this is here]''')
+st.markdown(''':blue[IQR alpha: controls the threshold for detecting outliers by setting the 
+                significance level used in the interquartile method for outlier detection. 
+                The default value is .05, or a 5% significance level. 
+                Lowering this number will result in a higher threshold, 
+                which means less values will be considered to be outliers. ]''')
 IQR_alpha = st.number_input("Enter IQR alpha value", value=0.05, step=0.01)
 
-st.markdown(''':blue[Clean alpha: add description about what this is here]''')
+st.markdown(''':blue[Clean alpha: The Clean alpha value sets the threshold for removing outliers in the data. 
+                A higher alpha level decreases the sensitivity]''')
+
 Clean_alpha = st.number_input("Enter Clean alpha value", value=0.75, step=0.1)
 
 
@@ -67,11 +75,11 @@ st.plotly_chart(fig2)
 if st.button("Show Statistical Decomposition"):
     # If the button is clicked, display Figure 3
     st.title("Statistical decomposition of time series statistics")
-    st.write("add description here about what these graphs mean ")
-    st.markdown(''':blue[*Observed*: add description here]''')
-    st.markdown(''':blue[*Trend*: add description here]''')
-    st.markdown(''':blue[*Seasonal*: add description here]''')
-    st.markdown(''':blue[*Residual*: add description here]''')
+    st.write("The time series data is decomposed into several components, which include:")
+    st.markdown(''':blue[*Observed*: Actual time series data]''')
+    st.markdown(''':blue[*Trend*: Underlying pattern or direction in the data over time]''')
+    st.markdown(''':blue[*Seasonal*: Trends in reoccuring cycles over the specified period]''')
+    st.markdown(''':blue[*Residual*: Residual represents what patterns are left unexplained in the data after trend and seasonal components have been removed from observed]''')
     fig3 = anomaly.anomaly_decomp(df,period,IQR_alpha,Clean_alpha)
     st.plotly_chart(fig3)
 
