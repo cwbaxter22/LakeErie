@@ -11,9 +11,6 @@ def map_main(selected_buoy):
     Returns:
     folium.Map: Folium map object showing buoy locations with markers.
 
-    Raises:
-    ValueError: If the selected_buoy is not in the predefined list of buoy names.
-    ValueError: If latitude or longitude values for any buoy are not numeric.
     """
 
     # Define the center of the map (for example, using the coordinates of Buoy 3)
@@ -36,14 +33,9 @@ def map_main(selected_buoy):
         raise ValueError(f"Invalid selected buoy '{selected_buoy}'. "
                          f"Please select a valid buoy from the list.")
 
-    # Check latitude and longitude values for completeness and numeric format
-    for buoy in buoy_locations:
-        if not isinstance(buoy["latitude"], (float, int)) or not isinstance(buoy["longitude"], (float, int)):
-            raise ValueError(f"Invalid coordinates for buoy '{buoy['name']}'. "
-                             "Latitude and longitude must be numeric.")
-
     # Create a map object using Folium
-    buoy_map = folium.Map(location=[center_latitude, center_longitude], zoom_start=11)
+    buoy_map = folium.Map(
+        location=[center_latitude, center_longitude], zoom_start=11)
 
     # Add markers for each buoy
     for buoy in buoy_locations:

@@ -245,7 +245,7 @@ def anomaly_decomp(data, period=7, iqr_alpha=0.05, clean_alpha=0.75):
 
     # Check if 'times' column exists and is of datetime type
     if 'times' not in data.columns or not pd.api.types.is_datetime64_any_dtype(data['times']):
-        raise TypeError("The 'times' column must exist and be of datetime type.")
+        raise TypeError("The 'times' column must be of datetime type.")
 
     # Check if 'value_mean' column exists
     if 'value_mean' not in data.columns:
