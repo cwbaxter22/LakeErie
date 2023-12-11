@@ -42,7 +42,7 @@ class TestDataTransformer(unittest.TestCase):
         │   │   └── TREC_Tower
         │   │       ├── Air_Temperature.csv
         │   │       └── ODO.csv
-        │   └── iChart
+        │   └── ichart
         │       ├── Beach2_Buoy
         │       │   ├── Air_Temperature.csv
         │       │   └── ODO.csv
@@ -64,7 +64,7 @@ class TestDataTransformer(unittest.TestCase):
             │   └── TREC_Tower
             │       ├── Air_Temperature.csv
             │       └── ODO.csv
-            └── iChart
+            └── ichart
                 ├── Beach2_Buoy
                 │   ├── Air_Temperature.csv
                 │   └── ODO.csv
@@ -76,7 +76,7 @@ class TestDataTransformer(unittest.TestCase):
 
         """
         self.devices = ["TREC_Tower", "Beach2_Buoy"]
-        self.project = ["new", "old", "iChart"]
+        self.project = ["new", "old", "ichart"]
         self.data_transformer = DataTransformer()
         for project in self.project:
             if not os.path.exists(f"../testdata/raw/{project}"):
@@ -111,14 +111,14 @@ class TestDataTransformer(unittest.TestCase):
             "../testdata/raw/new/Beach2_Buoy",
             "../testdata/raw/old/TREC_Tower",
             "../testdata/raw/old/Beach2_Buoy",
-            "../testdata/raw/iChart/TREC_Tower",
-            "../testdata/raw/iChart/Beach2_Buoy",
+            "../testdata/raw/ichart/TREC_Tower",
+            "../testdata/raw/ichart/Beach2_Buoy",
             "../testdata/processed/new/TREC_Tower",
             "../testdata/processed/new/Beach2_Buoy",
             "../testdata/processed/old/TREC_Tower",
             "../testdata/processed/old/Beach2_Buoy",
-            "../testdata/processed/iChart/TREC_Tower",
-            "../testdata/processed/iChart/Beach2_Buoy"
+            "../testdata/processed/ichart/TREC_Tower",
+            "../testdata/processed/ichart/Beach2_Buoy"
             ]
         for directory in directories:
             for filename in os.listdir(directory):
