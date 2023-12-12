@@ -5,15 +5,12 @@ functions in the DataTransformer class.
 """
 
 import os
-import sys
 import unittest
+import importlib
+import pathlib
 
 import numpy as np
 import pandas as pd
-
-sys.path.append("../../src/backend")
-from data_transformer import DataTransformer
-
 
 class TestDataTransformer(unittest.TestCase):
     """
@@ -75,6 +72,16 @@ class TestDataTransformer(unittest.TestCase):
         
         We do this to create all of the files that we would have in the real directory.
         """
+        codebase_path = pathlib.Path(__file__).parents[2]
+        #https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
+        spec = importlib.util.spec_from_file_location(
+            name='data_transformer_mod',  # name is not related to the file, it's the module name!
+            location= str(codebase_path) +
+            "//src//backend//data_transformer.py"  # full path to the script
+        )
+
+        data_transformer_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(data_transformer_mod)
         self.devices = ["TREC_Tower", "Beach2_Buoy"]
         self.project = ["new", "old", "ichart"]
         self.data_transformer = DataTransformer()
