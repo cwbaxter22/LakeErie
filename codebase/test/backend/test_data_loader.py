@@ -4,10 +4,24 @@ This is the testing script for the data_loader.py file which contains the DataLo
 from unittest.mock import patch
 import unittest
 import sys
+import pathlib
+import importlib
 
-sys.path.append("../../src/backend")
-from data_loader import DataLoader
+#sys.path.append("../../src/backend")
+#from data_loader import DataLoader
 
+codebase_path = pathlib.Path(__file__).parents[2]
+#https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
+spec = importlib.util.spec_from_file_location(
+    name='data_loader_mod',  # name is not related to the file, it's the module name!
+    location= str(codebase_path) +
+    "//src//backend//data_loader.py"  # full path to the script
+)
+
+data_loader_mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(data_loader_mod)
+
+#from data_loader_mod import DataLoader
 
 class TestDataLoader(unittest.TestCase):
     """
@@ -19,8 +33,8 @@ class TestDataLoader(unittest.TestCase):
     5) get_data
     """
 
-    @patch('data_loader.http.client.HTTPSConnection')
-    @patch('data_loader.http.client.HTTPResponse')
+    @patch('data_loader_mod.http.client.HTTPSConnection')
+    @patch('data_loader_mod.http.client.HTTPResponse')
     def test_api_call(self, mock_res, mock_conn):
         """
         This function tests that the api_call function in the DataLoader class 
@@ -31,7 +45,7 @@ class TestDataLoader(unittest.TestCase):
         mock_res.read.return_value = '{"devices": [{"id": "1234", "name": "test"}]}'.encode("utf-8")
 
         test_url = "/api/v1/devices?apiKey=1234"
-        data = DataLoader(apiKey="1234", project="test").api_call(url=test_url)
+        data = data_loader_mod.DataLoader(apiKey="1234", project="test").api_call(url=test_url)
 
         # Check that API is called with correct arguments
         mock_conn("www.wqdatalive.com").request.assert_called_with("GET", test_url)
@@ -45,18 +59,18 @@ class TestDataLoader(unittest.TestCase):
         """
         bad_data = {"message": "Request exceeds hourly limit"}
         # Check that function returns False if API quota has been reached
-        self.assertFalse(DataLoader(apiKey="1234", project="test").find_errors(data=bad_data))
+        self.assertFalse(data_loader_mod.DataLoader(apiKey="1234", project="test").find_errors(data=bad_data))
         # Check that function returns True if API response is valid
         good_data = {"devices": [{"id": "1234", "name": "test"}]}
-        self.assertTrue(DataLoader(apiKey="1234", project="test").find_errors(data=good_data))
+        self.assertTrue(data_loader_mod.DataLoader(apiKey="1234", project="test").find_errors(data=good_data))
 
-    @patch('data_loader.DataLoader.api_call', return_value={"devices": [{"id": "1234", "name": "test_device"}]})
+    @patch('data_loader_mod.DataLoader.api_call', return_value={"devices": [{"id": "1234", "name": "test_device"}]})
     def test_get_devices(self, mock_api_call):
         """
         This function tests that the get_devices function in the DataLoader class
         correctly parses the API response and returns the correct devices.
         """
-        data_loader = DataLoader(apiKey="1234", project="test")
+        data_loader = data_loader_mod.DataLoader(apiKey="1234", project="test")
 
         devices = data_loader.get_devices()
         # Verify that WQData API is only called once
@@ -66,15 +80,15 @@ class TestDataLoader(unittest.TestCase):
         # Verify that devices as stored in data_loader
         self.assertEqual(data_loader.devices, {"test_device": "1234"})
 
-    @patch('data_loader.DataLoader.api_call', return_value={"parameters": [{"id": "1234", "name": "Air Temperature", "unit": "test units"}]})
-    @patch('data_loader.DataLoader.find_errors', return_value=True)
+    @patch('data_loader_mod.DataLoader.api_call', return_value={"parameters": [{"id": "1234", "name": "Air Temperature", "unit": "test units"}]})
+    @patch('data_loader_mod.DataLoader.find_errors', return_value=True)
     def test_get_device_parameters(self, mock_find_errors, mock_api_call):
         """
         This function tests that the get_device_parameters function in the DataLoader class
         correctly parses the API response and returns the correct parameters for the device.
         """
 
-        data_loader = DataLoader(apiKey="1234", project="test")
+        data_loader = data_loader_mod.DataLoader(apiKey="1234", project="test")
         parameters = data_loader.get_device_parameters(deviceId="1234")
         
         # Verify that WQData API is only called once
@@ -89,14 +103,14 @@ class TestDataLoader(unittest.TestCase):
             {"Air_Temperature": ("1234", "test units")}
         )
 
-    @patch('data_loader.DataLoader.api_call', return_value={"data": [{"value": "1234", "timestamp": "2021-01-01T00:00:00.000Z"}]})
-    @patch('data_loader.DataLoader.find_errors', return_value=True)
+    @patch('data_loader_mod.DataLoader.api_call', return_value={"data": [{"value": "1234", "timestamp": "2021-01-01T00:00:00.000Z"}]})
+    @patch('data_loader_mod.DataLoader.find_errors', return_value=True)
     def test_get_data(self, mock_find_errors, mock_api_call):
         """
         This functions thats the get_data function in the DataLoader class calls the WQData API
         with the correct arguments and returns the correct data.
         """
-        data_loader = DataLoader(apiKey="1234", project="test")
+        data_loader = data_loader_mod.DataLoader(apiKey="1234", project="test")
         data = data_loader.get_data(
             deviceId="1234",
             parameterId="1234",
