@@ -21,7 +21,8 @@ import datetime
 import pandas as pd
 import numpy as np
 
-from config import OLD_API_KEY, NEW_API_KEY
+# from config import OLD_API_KEY, NEW_API_KEY
+OLD_API_KEY, NEW_API_KEY = 100, 200
 from data_loader import DataLoader
 
 # CREATE GLOBAL TIME CONSTANTS

@@ -3,15 +3,12 @@ This file is used to define a DataLoader class that can be used to interface wit
 It can be used to get a list of available devices, parameters, and data for a given project.
 """
 import http.client
-import datetime
 import json
 import pandas as pd
-import numpy as np
 from collections import defaultdict
 
 from typing import Dict
 from config_combine import PARAMETERS
-
 
 class DataLoader():
     """
@@ -161,6 +158,3 @@ class DataLoader():
         except Exception as e:
             print(e)
             return None
-
-
-

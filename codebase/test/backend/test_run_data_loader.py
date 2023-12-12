@@ -16,7 +16,7 @@ from run_data_loader import (
     aggregate_data,
     ping_api,
 )
-from config import OLD_API_KEY, NEW_API_KEY
+# from config import OLD_API_KEY, NEW_API_KEY
 
 
 class TestRunnerDataLoader(unittest.TestCase):
