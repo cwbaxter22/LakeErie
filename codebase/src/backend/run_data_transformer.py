@@ -15,15 +15,28 @@ Due to the large file size, we will only run this program once in order to gener
 data. 
 """
 import os
+import importlib
+import pathlib
 
 import pandas as pd
 
-from data_transformer import DataTransformer
+codebase_path = pathlib.Path(__file__).parents[2]
+#https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
+spec = importlib.util.spec_from_file_location(
+    name='data_transformer_mod',  # name is not related to the file, it's the module name!
+    location= str(codebase_path) +
+    "//src//backend//data_transformer.py"  # full path to the script
+    )
+
+data_transformer_mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(data_transformer_mod)
+
+#from data_transformer import DataTransformer
 
 
 # uncomment this section to run the data_transformer.py file for ichart data
 # ichart
-dataTransformer = DataTransformer()
+dataTransformer = data_transformer_mod.DataTransformer()
 dataTransformer.set_path("../../data/raw/ichart/pivot")
 dataTransformer.set_devices(["Beach2_Tower", "Beach2_Buoy", "Beach6_Buoy", "TREC_Tower"])
 dataTransformer.device_aggregate("ichart")
@@ -159,5 +172,5 @@ class DataWrangler:
         df_merged.to_csv(f"{directory}/tidy_daily_all_data.csv", index = False)
         print("tidied the data for ", directory)
 
-datawrangler = DataWrangler()
-datawrangler.downsample()
+#datawrangler = DataWrangler()
+#datawrangler.downsample()

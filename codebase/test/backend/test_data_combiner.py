@@ -6,13 +6,27 @@ This file is used to test the data_combiner.py file and functions.
 import os
 import sys
 import unittest
+import pathlib
+import importlib
 
 import numpy as np
 import pandas as pd
 
-sys.path.append("../../src/backend")
-from data_transformer import DataTransformer
-from data_combiner import DataCombiner
+
+#sys.path.append("../../src/backend")
+#from data_combiner import DataCombiner
+codebase_path = pathlib.Path(__file__).parents[2]
+#https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
+spec = importlib.util.spec_from_file_location(
+    name='data_combiner_mod',  # name is not related to the file, it's the module name!
+    location= str(codebase_path) +
+    "//src//backend//data_combiner.py"  # full path to the script
+    )
+
+data_combiner_mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(data_combiner_mod)
+
+
 
 
 class TestDataCombiner(unittest.TestCase):
@@ -26,8 +40,8 @@ class TestDataCombiner(unittest.TestCase):
         """
         Set up the test cases, including creating a testing directory with test csv files.
         """
-        self.data_transformer = DataTransformer()
-        self.data_combiner = DataCombiner()
+        #self.data_combiner = DataCombiner()
+        self.data_combiner = data_combiner_mod.DataCombiner()
         self.devices = ["TREC_Tower"]
         self.projects = ["new", "old", "ichart"]
 

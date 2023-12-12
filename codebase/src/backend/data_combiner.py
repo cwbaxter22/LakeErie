@@ -7,8 +7,24 @@ or any time we collect new data from the WQData API.
 
 import os
 import pandas as pd
+import pathlib
+import importlib
 
-from config_combine import COMBINE_MAP
+
+
+codebase_path = pathlib.Path(__file__).parents[2]
+#https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
+spec = importlib.util.spec_from_file_location(
+    name='config_combine_mod',  # name is not related to the file, it's the module name!
+    location= str(codebase_path) +
+    "//src//backend//config_combine.py"  # full path to the script
+    )
+
+config_combine_mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(config_combine_mod)
+
+
+#from config_combine import COMBINE_MAP
 
 
 class DataCombiner():
@@ -24,6 +40,7 @@ class DataCombiner():
         self.path = ""
         self.map = {}
 
+
     def set_path(self, path: str = "../../data/processed"):
         """
         Set the path to the data directory.
@@ -33,7 +50,7 @@ class DataCombiner():
         """
         self.dir = path
 
-    def set_map(self, map: dict = COMBINE_MAP):
+    def set_map(self, map: dict = config_combine_mod.COMBINE_MAP):
         """
         Set the map to the data directory.
 

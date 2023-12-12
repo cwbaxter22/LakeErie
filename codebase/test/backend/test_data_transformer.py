@@ -84,7 +84,8 @@ class TestDataTransformer(unittest.TestCase):
         spec.loader.exec_module(data_transformer_mod)
         self.devices = ["TREC_Tower", "Beach2_Buoy"]
         self.project = ["new", "old", "ichart"]
-        self.data_transformer = DataTransformer()
+        #self.data_transformer = DataTransformer()
+        self.data_transformer = data_transformer_mod.DataTransformer()
         for project in self.project:
             if not os.path.exists(f"../testdata/raw/{project}"):
                 os.makedirs(f"../testdata/raw/{project}")
