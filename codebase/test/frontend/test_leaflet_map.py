@@ -1,3 +1,8 @@
+"""Test cases for the map_main function in leaflet_map.py, 
+    which used folium to create a simple map of Bouy locations
+    and a specified basemap. Location markers turn red based 
+    on the user selected site location."""
+
 import unittest
 import importlib
 import pathlib
