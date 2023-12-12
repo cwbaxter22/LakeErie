@@ -53,7 +53,7 @@ st.markdown(''':blue[Period: The period is the window size for analyzing anomali
                 This value should be adjusted to represent an appropriate time period 
                 for analyzing your data. This value cannot be less than 7 ]''')
 
-pperiod = st.number_input("Enter Period value", value=7, step=1)
+period = st.number_input("Enter Period value", value=7, step=1)
 if period < 7:
     period = 7
 
@@ -63,6 +63,8 @@ st.markdown(''':blue[IQR alpha: controls the threshold for detecting outliers by
                 Lowering this number will result in a higher threshold, 
                 which means less values will be considered to be outliers. ]''')
 IQR_alpha = st.number_input("Enter IQR alpha value", value=0.05, step=0.01)
+
+Clean_alpha = st.number_input("Enter Clean alpha value", value=0.75, step=0.1)
 
 # Create figure 2 , the anomaly detection.
 fig2 = anomaly.create_anomaly_graph(df, period, IQR_alpha, Clean_alpha)
