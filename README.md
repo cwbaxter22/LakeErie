@@ -118,8 +118,24 @@ Fork or clone the repository with it’s associated raw data files
 - Step 2: run run_data_loader.py  to obtain the “old” and “new” project data in a workable form
 - Step 3: run run_data_transformer.py to tidy, donwsample, and clean the data.
 - Step 4: run data_combiner.py to combine the data across projects into all data by device.
- 
-## If you would like to download the raw data for the “old” and “new”
+
+## Downloading Data 
+### data_loader.py
+This script defines a class called DataLoader than can be used to access the WQData API. It has helper functions for common interations such as get_devices, get_device_parameters, and get_data. The DataLoader class can also store a state on parameters and devices that have been processed by the data_transformer class. 
+### run_data_loader.py
+This script uses the DataLoader class to download data from the WQData website, within the constraints of the API. Please refer to the next section and the module docstring for a full description of usage. 
+
+## Downloading the raw "old" and "new" data from WQData Website
+If you would like to download the raw data for the “old” and “new”, please follow these steps: 
+- Step 1: You should begin by setting up an account on WQData live's website and downloading one API key for the "old" project and one API key for the "new" project.
+- Step 2: Create a local config.py file in that src/backend folder and set OLD_API_KEY and NEW_API_KEY to your personal values. Note that config.py is included in our .gitignore file because API keys should generally be kept private. 
+- Step 3: Uncomment the block of code at the bottom of run_data_loader.py and execute the script.
+
+The WQData API only allows 140 API calls per hour, 5,000 data points per API call, and 90 days of data per API call. 
+The aim of the run_data_loader script is to use the DataLoader class defined in data_loader.py to scrape data from the WQData API and save it to CSV files 
+efficiently and within the constraints of the WQData API. Additionally, you can modify config_combine.py to alter which parameters and devices are 
+downloaded.
+
  
 ## Version 2 live data:
 In version 2 we hope to expand the data collection to include live data. Given the timeframe of the project, we did not think it was feasible to add it in version 1, especially with the state the data was in. We hypothesize the easiest way to add live data would be to have a new script that is constantly running and sleeping in the background that collects the most recent data and appends it to the processed csv files we created. In this manner, the csv files are constantly growing with the newest data every 10 minutes. In this way, we don’t believe the scripts would hit the api call limit, and cleaning and processing the data will be relatively simple and fast due to the small file sizes.
