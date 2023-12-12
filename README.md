@@ -13,7 +13,8 @@ This code creates a GUI which displays trends in limnological and environmental 
 Technology Review Presentation Available here:
 https://docs.google.com/presentation/d/1Gqygo2uVCjlTfW1YYUflClmrQNrQyhChPKJihoyyjBY/edit?usp=sharing
 
-
+# Project Layout:
+![Alt text](image-6.png)
 
 # Data 
 
