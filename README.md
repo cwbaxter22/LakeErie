@@ -15,7 +15,7 @@ https://docs.google.com/presentation/d/1Gqygo2uVCjlTfW1YYUflClmrQNrQyhChPKJihoyy
 
 
 
-# Data Draft
+# Data 
 
 ## Data definitions:
 ### Project
@@ -35,6 +35,8 @@ Example: TREC_Tower
 Each device has a suite of parameters that it measures. These are not the same for every device, as the loggers have different hardware. 
 
 Example: Air_Temperature
+
+
 
  
 ## Motivation
@@ -120,7 +122,7 @@ Fork or clone the repository with it’s associated raw data files
 ## If you would like to download the raw data for the “old” and “new”
  
 ## Version 2 live data:
-In version 2 we hope to expand the data collection to include live data. Given the timeframe of the project, we did not think it was feasible to add it in version 1, especially with the state the data was in. We hypothesize the easiest way to add live data would be to have a new script that is constantly running and sleeping in the background that collects the most recent data and appends it to the processed csv files we created. In this manner, the csv files are constantly growing with the newest data every 10 minutes. In this way, we don’t believe the scripts would hit the api call limit, and cleaning and processing the data will be easy and fast due to the small file sizes.
+In version 2 we hope to expand the data collection to include live data. Given the timeframe of the project, we did not think it was feasible to add it in version 1, especially with the state the data was in. We hypothesize the easiest way to add live data would be to have a new script that is constantly running and sleeping in the background that collects the most recent data and appends it to the processed csv files we created. In this manner, the csv files are constantly growing with the newest data every 10 minutes. In this way, we don’t believe the scripts would hit the api call limit, and cleaning and processing the data will be relatively simple and fast due to the small file sizes.
  
 
 
