@@ -7,8 +7,8 @@ WQData also transitioned to new dataloggers in 2016, so another challenge is the
 each with their own API key. 
 
 To do this we run aggregate_data() twice: 
-1. Execute Aggregate Data with API key set to old
-2. Execute Aggregate Data with API key set to new
+1. Execute Aggregate Data with API key set to old.
+2. Execute Aggregate Data with API key set to new.
 
 Ideally this script only needs to be run once to get all of the data.
 

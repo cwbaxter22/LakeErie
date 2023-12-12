@@ -1,5 +1,5 @@
 """
-This file is used to define a DataLoader class that can be used to interface with the WQdata API
+This file is used to define a DataLoader class that can be used to interface with the WQdata API.
 It can be used to get a list of available devices, parameters, and data for a given project.
 """
 import http.client

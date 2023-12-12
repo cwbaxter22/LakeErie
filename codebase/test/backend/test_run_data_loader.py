@@ -1,7 +1,7 @@
 """
 This is the testing script for the run_data_loader.py file. The run_data_loader files uses the
 DataLoader class to call the WQData API and save the data to the raw data directory from multiple
-project sources (old and new). Note that run_data_loader has significant logic to handle the constraints
+project sources (old and new). Note that run_data_loader has significant logic to handle the constraints.
 of the WQData API (e.g. hourly limit, data limit, etc.). 
 """
 from unittest.mock import patch, MagicMock
