@@ -334,6 +334,7 @@ class TestAnomalyDecomp(unittest.TestCase):
             anomaly_mod.anomaly_decomp(data)
 
         expected_error_message = "The 'times' column must be of datetime type."
+
         self.assertEqual(str(context.exception), expected_error_message)
 
     # Test to ensure decomp is created

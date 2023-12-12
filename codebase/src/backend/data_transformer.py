@@ -10,8 +10,6 @@ and can be stored on the users computer to run with the dashboard front end.
 import os
 import pandas as pd
 
-#from data_loader import DataLoader
-
 
 class DataTransformer():
     """
@@ -31,7 +29,7 @@ class DataTransformer():
         """
         Arguments:
         --------
-        variable (type): description
+    
         
         Returns:
         --------
@@ -41,7 +39,6 @@ class DataTransformer():
         """
 
         #undo the comment below and comment out the line below that to get the devices from the API
-        #self.devices = list(DataLoader.get_devices().keys())
         self.devices = []
         self.raw_path = ""
         self.processed_path = ""

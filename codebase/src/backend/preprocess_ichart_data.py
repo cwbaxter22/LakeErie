@@ -16,23 +16,25 @@ class OldDataTransformer():
     processed raw data will be available to users. Otherwise, the user would
     need to jump through a ton of hoops to get the data into a csv file that 
     could be read.
-
     """
 
     def __init__(self) -> None:
+        # hardcoded device names for the iChart data.
         self.device_id = ["TREC_Tower", "Beach6_Buoy", "Beach2_Tower", "Beach2_Buoy"]
 
 
 
-    def transform(self, device) -> None:
+    def transform(self, device: str) -> None:
         """
-        This function 
+        This function transforms the iChart data into a raw format that can be
+        used with the data_transformer function and subsequent data processing
+        and cleaning functions. 
 
         Arguments:
-        
+        device(str) -- the device name that is being transformed.
         
         Returns:
-        
+        no returns, but creates a csv file for each device
         
         Raises:
         -------
@@ -95,9 +97,9 @@ class OldDataTransformer():
 
     def format_pivot(self,device: str, parameter_id: str) -> None:
         """
-        Doc String goes here
-
         This function is used to format the data into pivot table format
+        so that it can be used with the data_transformer function and subsequent
+        data processing and cleaning functions.
         """
         path = f"../data/iChart6_data/raw/by_parameter/{device}/{parameter_id}"
         df = pd.read_csv(path , encoding='latin-1')

@@ -1,5 +1,7 @@
 """
-Docstring
+This file contains the unit tests for the DataTransformer class.
+It creates test files in the testdata directory and tests the 
+functions in the DataTransformer class.
 """
 
 import os
@@ -17,7 +19,6 @@ class TestDataTransformer(unittest.TestCase):
     2) tidy_data_transform
     3) downsample_hour
     4) downsample_day
-
     """
 
     def setUp(self) -> None:
@@ -39,7 +40,7 @@ class TestDataTransformer(unittest.TestCase):
         │   │   └── TREC_Tower
         │   │       ├── Air_Temperature.csv
         │   │       └── ODO.csv
-        │   └── iChart
+        │   └── ichart
         │       ├── Beach2_Buoy
         │       │   ├── Air_Temperature.csv
         │       │   └── ODO.csv
@@ -61,7 +62,7 @@ class TestDataTransformer(unittest.TestCase):
             │   └── TREC_Tower
             │       ├── Air_Temperature.csv
             │       └── ODO.csv
-            └── iChart
+            └── ichart
                 ├── Beach2_Buoy
                 │   ├── Air_Temperature.csv
                 │   └── ODO.csv
@@ -70,7 +71,6 @@ class TestDataTransformer(unittest.TestCase):
                     └── ODO.csv
         
         We do this to create all of the files that we would have in the real directory.
-
         """
         codebase_path = pathlib.Path(__file__).parents[2]
         #https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
@@ -83,8 +83,8 @@ class TestDataTransformer(unittest.TestCase):
         data_transformer_mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(data_transformer_mod)
         self.devices = ["TREC_Tower", "Beach2_Buoy"]
-        self.project = ["new", "old", "iChart"]
-        self.data_transformer = data_transformer_mod.DataTransformer()
+        self.project = ["new", "old", "ichart"]
+        self.data_transformer = DataTransformer()
         for project in self.project:
             if not os.path.exists(f"../testdata/raw/{project}"):
                 os.makedirs(f"../testdata/raw/{project}")
@@ -103,7 +103,6 @@ class TestDataTransformer(unittest.TestCase):
     def tearDown(self) -> None:
         """
         This function calls wipe_test_data which will delete the test directory created in setUp
-        
         """
         self.wipe_test_data()
 
@@ -118,14 +117,14 @@ class TestDataTransformer(unittest.TestCase):
             "../testdata/raw/new/Beach2_Buoy",
             "../testdata/raw/old/TREC_Tower",
             "../testdata/raw/old/Beach2_Buoy",
-            "../testdata/raw/iChart/TREC_Tower",
-            "../testdata/raw/iChart/Beach2_Buoy",
+            "../testdata/raw/ichart/TREC_Tower",
+            "../testdata/raw/ichart/Beach2_Buoy",
             "../testdata/processed/new/TREC_Tower",
             "../testdata/processed/new/Beach2_Buoy",
             "../testdata/processed/old/TREC_Tower",
             "../testdata/processed/old/Beach2_Buoy",
-            "../testdata/processed/iChart/TREC_Tower",
-            "../testdata/processed/iChart/Beach2_Buoy"
+            "../testdata/processed/ichart/TREC_Tower",
+            "../testdata/processed/ichart/Beach2_Buoy"
             ]
         for directory in directories:
             for filename in os.listdir(directory):
@@ -139,7 +138,6 @@ class TestDataTransformer(unittest.TestCase):
         """
         Creates a test CSV file with the following columns:
         times, parameter1, parameter2, parameter3
-
         We can then use this to test the across_parameter_aggregate function.
         """
 
@@ -164,10 +162,8 @@ class TestDataTransformer(unittest.TestCase):
         """
         Creates a test CSV file with the following columns:
         times, ODO, Units, Air_Temperature
-
         This dataframe is the result of the across_parameter_aggregate function.
         We use this to test the tidy_data_transform function.
-
         """
         data = {
             "times": ["1/1/2018 13:10",
@@ -189,11 +185,8 @@ class TestDataTransformer(unittest.TestCase):
         """
         Creates a test CSV file with the following columns:
         times, Units, parameter, value
-
         This dataframe is the output of the tidy_data_transform function.
-
         We use this to test the downsample_hour and downsample_day functions.
-        
         """
         data = {
             "times": ["1/1/2018 13:10",
@@ -222,7 +215,6 @@ class TestDataTransformer(unittest.TestCase):
         This function tests that the across_parameter_aggregate function in the DataTransformer
         class correctly merges the csv files in the raw directory and writes the result to the 
         processed directory.
-
         """
 
 
