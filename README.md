@@ -16,51 +16,93 @@ https://docs.google.com/presentation/d/1Gqygo2uVCjlTfW1YYUflClmrQNrQyhChPKJihoyy
 
 
 # Data Draft
-The data for this project is structured and discussed in the following way:
-Project – Device – Parameter
-Where,
-- Project is the source of the data (separated by year/software) [“ichart”, “old”, “new”]
-- Device is the datalogger (location) [ex: “TREC_Tower”, “Beach2_Buoy”]
-- Parameter is the specific variable you are interested in [ex: “Air_Temperature”, “ODO”]
+
+## Data definitions:
+### Project
+Throughout the backend code, we use project to describe which time period the data is coming from. In our instance, we pull data from three sources:
+- ichart - data between 2006 - 2011
+- "old" project database on WQData live* - data between 2014 - 2020
+- "new" project database on WQData live* - data between 2014 - present
+
+*link for WQData live: https://www.wqdatalive.com/ 
+
+### Device
+Each data logger deployed by the Regional Science Consortium has a device id and name. For any data visualization tools or filenames, we use the device name. These are not always held constant in the raw data across projects. 
+
+Example: TREC_Tower
+
+### Parameter
+Each device has a suite of parameters that it measures. These are not the same for every device, as the loggers have different hardware. 
+
+Example: Air_Temperature
+
  
-The data manipulation we performed was a crucial part of this project, and will hopefully be a huge help to the Regional Science Consortium. The data was split into 3 different areas, 2 of which the regional science consortium could not access, nor did they know where it was. The data across all three projects, spanning 15+ years, was very messy and inconsistent. There were multiple changes to the Device name (location, ex: “TREC_Tower” and “TREC_Tower_iSIC”), Parameter name for a given device (“DO” and “ODO”), Parameter name across devices, units for a given parameter. Merging all of the data sets and standardizing the format proved to be quite a challenge.
+## Motivation
+The data manipulation we performed was a crucial part of this project, and will be a huge help to the Regional Science Consortium. The data was split across 3 different databases, 2 of which the regional science consortium could not access, nor did they know where it was located. The data across all 3 projects, spanning 15+ years, was very messy and inconsistent. There were multiple changes to the Device name (location, ex: “TREC_Tower” and “TREC_Tower_iSIC”), Parameter name for a given device (“DO” and “ODO”), Parameter name across devices, and units for a given parameter. Merging all of the data sets and standardizing the format proved to be quite the time-intesive challenge.
  
 ## Raw data
-The raw data comes from the regional science consortium and their weather devices on lake erie. Specifically, the data we are using in this repository comes from three different sources/timeperiods:
-iChart6 – an archived database managed by nexsens
-WQDatalive project “Regional Science Consortium (Old)” – an archived database managed by nexsens
-WQDatalive project “Regional Science Consortium” – a current database managed by nexsens
-The raw data for a given parameter and device is variable, in the sense that it is not all collected the same way. Tower locations collect data every 10 minutes, some buoys collect data every 20 minutes, and lastly, other buoys collect data every 30 minutes.
+The raw data comes from the Regional Science Consortium and their weather devices on lake erie. Specifically, the data we are using in this repository comes from three different projects:
+
+- iChart6 – an archived database managed by nexsens
+- WQDatalive project “Regional Science Consortium (Old)” – an archived database managed by nexsens
+- WQDatalive project “Regional Science Consortium (new)” – a current database managed by nexsens
+
+The method of data collection was not constant across parameters, devices, or projects. Tower locations collect data every 10 minutes, some buoys collect data every 20 minutes, and lastly, other buoys collect data every 30 minutes.
  Towers are left running year round, so in theory, you have 365 days worth of data (collecting every 10 minutes). Buoys are only in the water in the spring-fall, but the time they go in and are taken out is variable (largely it was May to October). There are large gaps in the data when the devices were not working or had issues. There were even larger gaps in the data between projects.
+
 Each data source presented its own challenges that will be explained below.
 ### Projects:
 #### iChart6
-This archived database turned out to be the easiest to get data from, but the most difficult to clean. The data was shared via a googledrive link, which was downloaded locally on to our machine. We then had to download, and receive login credentials for the archived software that is needed to run/open the raw datafiles from the googledrive. Once you set up and configured the old software, you could manually download the data by device for all parameters for a given year. After downloading all of the data to usable csvs, we had to clean the data to get it into a standardized format. We uploaded the raw csvs to this repository, as well as all of the steps in the cleaning process for transparency.
-Data exists for this database from 2006-2011 for TREC_Tower and Beach2_Tower, 2008-2011 for Beach2_Buoy, and 2011 for Beach6_Buoy.
+This archived database turned out to be the easiest to get data from, but difficult to access and clean. The data was shared via a google drive link, which was downloaded locally to our machine. We then had to download, and receive login credentials for the archived software that is needed to run/open the raw datafiles from the googledrive -- called iChart6. Once you set up and configured the old software, you could manually download the data by device for all parameters for a given year. After downloading all of the data to usable csvs, we had to clean the data to get it into a standardized format. We uploaded the raw csvs to this repository, as well as all of the steps in the cleaning process for transparency.
+
+Devices and years with data:
+- TREC_Tower, years 2006-2011
+- Beach2_Tower, years 2006-2011
+- Beach2_Buoy, years 2008-2011
+- Beach6_Buoy, year 2011
+
  
 #### “Old”
-This archived database was on the currently support WQData live website. It could be accessed via API. If you wanted to get the raw data, you would need to obtain access to this archived database, as well as an API key. 
-Data exists from this database from 2014-2020 for Beach2_Tower and Near_Shore_Buoy, 2016-2020 for Beach2_Buoy and Walnut_Creek_Buoy, and 2019-2020 for Beach6_Buoy.
+This archived database was on the currently support WQData live website. It could be accessed via API. If you wanted to get the raw data, you would need to obtain access to this archived database, as well as an API key.
+
+Devices and years with data:
+- Beach2_Tower, years 2014-2020
+- Near_Shore_Buoy, years 2014-2020
+- Beach2_Buoy, years 2016-2020
+- Walnut_Creek_Buoy, years 2016-2020
+- Beach6_Buoy, years 2019-2020
+
  
 #### “New”
 This database is live on WQData live’s website and is updated with new/current data. 
-Data exists from this database from 2014-present for TREC_Tower, 2016-present for Bay_Buoy and 2021-present for the other locations.
+
+Devices and years with data:
+- TREC_Tower, years 2014-present
+- Bay_Buoy, years 2016-present
+- Beach2_Tower, years 2021-present
+- Near_Shore_Buoy, years 2021-present
+- Beach2_Buoy, years 2021-present
+- Walnut_Creek_Buoy, years 2021-present
+- Beach6_Buoy, years 2021-present
 
 ### Note on Device: 
 There was an unknown device from the “new” project. Specifically Near Shore Buoy had two device IDs. We chose one of them for this project.
+
 ### Note on Parameter: 
 Parameter names were not kept constant throughout the life history of all projects. This led to much confusion about what some of the parameters were. Specifically, there exists “battery temperature”, “air temperature”, “water temperature”, and “temperature” for some devices. Since we could not determine what “temperature” was measuring, we did not try to group it with other devices. 
+
  We were not able to download all of the data - i.e. all parameters - for the “old” and “new” projects. This was due to the fact that we had limited API calls, and limited API functionality. Each API call was limited to 5000 data points, and when some of the loggers are collecting data every 10 minutes for 20 parameters, it adds up fast. We calculated that we could only use 1 API call for 1 month for 1 parameter. This means that it would take 120 calls (our maximum calls per hour) to get all the data (10 years) for 1 parameter on 1 device. We had 20 parameters for 7 devices. That is roughly 6 days of continual running to obtain the data. We could not justify this decision. Instead, we obtained the data for the most important parameters as specified by the Regional Science Consortium – Air temperature, Water temperature, and ODO. 
 
  
 ## Processed Data
 To clean and process this data we used the following python scripts:
-### Pre-process_ichart_data.py
+### pre-process_ichart_data.py
 This file adjusts the column names, removes unnecessary headers, replaces empty strings with NaN values, and saves the data to a new csv that matches the format necessary for the functions in data_transformer.py.
-### Data_transformer.py
+### data_transformer.py
 This file contains the functions needed in run_data_transformer.py. The functions aggregates all the data from one device (for a given project), transforms the data into tidy format, and downsampled the data into hourly and daily time periods. This downsampling is essential, due to the large files.
-### Run_data_transformer.py
+### run_data_transformer.py
 This file is a wrapper for actually processing and cleaning the data. Originally it was developed to run the data_tranformer.py file for each project, however it had to be altered because of the very large files for the tower devices from “old” and “new” project.
+
 NOTE: there was an error when running data_loader.py, and the file for TREC_Tower contained multiple copies of the data and headers, leading the file to be 700Mb+ in size.
 The script was altered to first downsample the data into hourly and daily time periods. Next duplicates were removed from the file to parse it down and clean.
 Lastly, the dataframes are transformed into tidy format, standardizing all of the data in the same way.
@@ -80,12 +122,6 @@ Fork or clone the repository with it’s associated raw data files
 ## Version 2 live data:
 In version 2 we hope to expand the data collection to include live data. Given the timeframe of the project, we did not think it was feasible to add it in version 1, especially with the state the data was in. We hypothesize the easiest way to add live data would be to have a new script that is constantly running and sleeping in the background that collects the most recent data and appends it to the processed csv files we created. In this manner, the csv files are constantly growing with the newest data every 10 minutes. In this way, we don’t believe the scripts would hit the api call limit, and cleaning and processing the data will be easy and fast due to the small file sizes.
  
- 
-
-
-
-
-
 
 
 
