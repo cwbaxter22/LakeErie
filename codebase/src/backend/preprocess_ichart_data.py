@@ -1,5 +1,11 @@
 """
-Docstring here.
+This class is used to transform the downloaded iChart data to a raw format
+that can be used with the data_transformer function and subsequent data
+processing and cleaning functions. Due to the nature of the iChart data
+this function was meant to be run once by the dev team, and then the
+processed raw data will be available to users. Otherwise, the user would
+need to jump through a ton of hoops to get the data into a csv file that 
+could be read.
 """
 
 import os

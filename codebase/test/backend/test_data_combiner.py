@@ -1,5 +1,8 @@
 """
-This file is used to test the data_combiner.py file and functions.
+This file is used to test the data_combiner.py file and functions. 
+It creates data files to be used for testing the data_combiner.py file.
+The data files are created in the testdata directory.
+They are deleted after the tests are run.
 
 """
 
@@ -76,7 +79,7 @@ class TestDataCombiner(unittest.TestCase):
         """
         for project in self.projects:
             for device in self.devices:
-                path = f"../testdata/processed"
+                path = "../testdata/processed"
                 if os.path.exists(f"{path}/{project}/{device}/tidy_daily_all_data.csv"):
                     os.remove(f"{path}/{project}/{device}/tidy_daily_all_data.csv")
                 if os.path.exists(f"{path}/{project}/{device}/tidy_hourly_all_data.csv"):

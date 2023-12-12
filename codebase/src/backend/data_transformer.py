@@ -27,9 +27,9 @@ class DataTransformer():
 
     def __init__(self) -> None:
         """
+        Initialize the DataTransformer class.
         Arguments:
         --------
-    
         
         Returns:
         --------
@@ -38,7 +38,6 @@ class DataTransformer():
         -------
         """
 
-        #undo the comment below and comment out the line below that to get the devices from the API
         self.devices = []
         self.raw_path = ""
         self.processed_path = ""
@@ -239,8 +238,6 @@ class DataTransformer():
     def downsample_day(self, df: pd.DataFrame, device_name: str, project: str) -> None:
         """
         This function will downsample the data to 1 day intervals.
-        TODO:
-        1) do we want standard error to the mean? or is std enough?
         """
         daily_df = pd.DataFrame()
         #is this doubled up in another function?
