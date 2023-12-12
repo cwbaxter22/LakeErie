@@ -155,11 +155,11 @@ To begin, the user is prompted to select whether they want to view hourly or dai
 
 Data collection sites are displayed on a dynamic map, which allows the user to zoom in and out, pan around the map, and colors the selected site in **red**. Hovering over the icon in the map will display the name of the site.
 
-![Alt text](image-1.png)
+![Alt text](Docs/image-1.png)
 
 Users can then select the Start-date ,end-date, and variable they would like to view from the sidebar. Time series data is then visualized with a smooth line fit to the data in blue. 
 
-![Alt text](image-2.png)
+![Alt text](Docs/image-2.png)
 
 **NOTE:** Not all variables are available for all sites and all time periods. Significant data gaps exist in the data. If seleced time period or variable does not exist, no data will be displayed
 
@@ -167,7 +167,7 @@ If the user is interesting in observing the valued displayed, a *Show Selected D
 
  This will display the data in a table below the plot. The user has the functionality to scroll through the data, filter each collumn in ascending or descending order, and download the data as a CSV file.
 
-![Alt text](image-3.png)
+![Alt text](Docs/image-3.png)
 
 ### Anomaly Detection
 
@@ -181,11 +181,11 @@ Anomalies are identified by detecting underlying seaonal and trend components of
 
 After selecting the user-prefered variabled for **Period** and **IQR alpha**, the dashboard displays the time series data with added anomaly bands displayed in gray. Data points that fall outside of this range are colored red to clearly indicate that they are considered anomalies given the user-selected parameters. User can hover over these points to get further data. 
 
-![Alt text](image-4.png)
+![Alt text](Docs/image-4.png)
 
 Finally, the "Show Statistical Decomposition" button below the plot will display the statistical decomposition of the time series data. This will display the seasonal, trend, and residual components of the data.
 
-![Alt text](image-5.png)
+![Alt text](Docs/image-5.png)
 
 
 
