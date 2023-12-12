@@ -1,5 +1,5 @@
 """
-This file is used to test the data_combiner.py file.
+This file is used to test the data_combiner.py file and functions.
 
 """
 
@@ -17,12 +17,14 @@ from data_combiner import DataCombiner
 
 class TestDataCombiner(unittest.TestCase):
     """
-    
+    This testing class tests the functions in the data_combiner.py file.
+    Specifically, it sets up a testing directory with test csv files and
+    tests the combine_daily and combine_hourly functions.
     """
 
     def setUp(self) -> None:
         """
-        Set up the test cases.
+        Set up the test cases, including creating a testing directory with test csv files.
         """
         self.data_transformer = DataTransformer()
         self.data_combiner = DataCombiner()
@@ -44,7 +46,7 @@ class TestDataCombiner(unittest.TestCase):
             for device in self.devices:
                 if not os.path.exists(f"../testdata/processed/{project}/{device}"):
                     os.mkdir(f"../testdata/processed/{project}/{device}")
-  
+
                 if not os.path.exists(f"../testdata/processed/combined/{device}"):
                     os.mkdir(f"../testdata/processed/combined/{device}")
 
@@ -56,24 +58,25 @@ class TestDataCombiner(unittest.TestCase):
 
     def tearDown(self) -> None:
         """
-        Tear down the test cases.
+        Tear down the test cases and remove the files. 
         """
         for project in self.projects:
             for device in self.devices:
-                if os.path.exists(f"../testdata/processed/{project}/{device}/tidy_daily_all_data.csv"):
-                    os.remove(f"../testdata/processed/{project}/{device}/tidy_daily_all_data.csv")
-                if os.path.exists(f"../testdata/processed/{project}/{device}/tidy_hourly_all_data.csv"):
-                    os.remove(f"../testdata/processed/{project}/{device}/tidy_hourly_all_data.csv")
-                if os.path.exists(f"../testdata/processed/combined/{device}/daily_data.csv"):
-                    os.remove(f"../testdata/processed/combined/{device}/daily_data.csv")
-                if os.path.exists(f"../testdata/processed/combined/{device}/hourly_data.csv"):
-                    os.remove(f"../testdata/processed/combined/{device}/hourly_data.csv")
-                if os.path.exists(f"../testdata/processed/{project}/{device}"):
-                    os.rmdir(f"../testdata/processed/{project}/{device}")
-                if os.path.exists(f"../testdata/processed/combined/{device}"):
-                    os.rmdir(f"../testdata/processed/combined/{device}")
-            if os.path.exists(f"../testdata/processed/{project}"):
-                os.rmdir(f"../testdata/processed/{project}")
+                path = f"../testdata/processed"
+                if os.path.exists(f"{path}/{project}/{device}/tidy_daily_all_data.csv"):
+                    os.remove(f"{path}/{project}/{device}/tidy_daily_all_data.csv")
+                if os.path.exists(f"{path}/{project}/{device}/tidy_hourly_all_data.csv"):
+                    os.remove(f"{path}/{project}/{device}/tidy_hourly_all_data.csv")
+                if os.path.exists(f"{path}/combined/{device}/daily_data.csv"):
+                    os.remove(f"{path}/combined/{device}/daily_data.csv")
+                if os.path.exists(f"{path}/combined/{device}/hourly_data.csv"):
+                    os.remove(f"{path}/combined/{device}/hourly_data.csv")
+                if os.path.exists(f"{path}/{project}/{device}"):
+                    os.rmdir(f"{path}/{project}/{device}")
+                if os.path.exists(f"{path}/combined/{device}"):
+                    os.rmdir(f"{path}/combined/{device}")
+            if os.path.exists(f"{path}/{project}"):
+                os.rmdir(f"{path}/{project}")
 
     def create_processed_test_csv(self, project: str, year: str):
         """
@@ -81,8 +84,11 @@ class TestDataCombiner(unittest.TestCase):
 
         Parameters
         ----------
-        path : str
-            The path of the csv file to be created.
+        project : str
+            The project you want to create the test csv file for.
+        year : str
+            The year you want in the test csv file.
+        
         """
         # create a test csv file for tidy_all_data
         for device in self.devices:
@@ -96,8 +102,8 @@ class TestDataCombiner(unittest.TestCase):
             expected_daily_data["times"] = pd.to_datetime(expected_daily_data["times"])
             expected_daily_data["times"] = pd.Series(expected_daily_data["times"])
             expected_daily_data = pd.DataFrame(expected_daily_data)
-            expected_daily_data.to_csv(f"../testdata/processed/{project}/{device}/tidy_daily_all_data.csv", index=False)
-
+            path = f"../testdata/processed/{project}/{device}"
+            expected_daily_data.to_csv(f"{path}/tidy_daily_all_data.csv", index=False)
 
             expected_hourly_data = {
                 "times": [f"1/1/{year} 13:00", f"1/1/{year} 13:00"],
@@ -109,20 +115,27 @@ class TestDataCombiner(unittest.TestCase):
             expected_hourly_data["times"] = pd.to_datetime(expected_hourly_data["times"])
             expected_hourly_data["times"] = pd.Series(expected_hourly_data["times"])
             expected_hourly_data = pd.DataFrame(expected_hourly_data)
-            expected_hourly_data.to_csv(f"../testdata/processed/{project}/{device}/tidy_hourly_all_data.csv", index=False)
-
-
-        
-        
+            expected_hourly_data.to_csv(f"{path}/tidy_hourly_all_data.csv", index=False)
 
     def test_combine_daily(self):
         """
-        
+        This function tests the combine_daily function. It compares the 
+        output function with the expected simulated data given below. 
         """
-
+        # expected data given the transformations above.
         expected_data = {
-            "times": ["2011-01-01", "2011-01-01", "2018-01-01", "2018-01-01", "2022-01-01", "2022-01-01"],
-            "parameter": ["Air_Temperature","ODO", "Air_Temperature", "ODO", "Air_Temperature", "ODO"],
+            "times": ["2011-01-01",
+                      "2011-01-01",
+                      "2018-01-01",
+                      "2018-01-01",
+                      "2022-01-01",
+                      "2022-01-01"],
+            "parameter": ["Air_Temperature",
+                          "ODO",
+                          "Air_Temperature",
+                          "ODO",
+                          "Air_Temperature",
+                          "ODO"],
             "Units": ["F", "mg/L", "F", "mg/L", "F", "mg/L"],
             "value_mean": [42.4, 9.9, 42.4, 9.9, 42.4, 9.9],
             "value_std": [0.43589,0.6245, 0.43589, 0.6245, 0.43589, 0.6245],
@@ -156,8 +169,10 @@ class TestDataCombiner(unittest.TestCase):
 
     def test_combine_hourly(self):
         """
-        Testing the function combine_hourly.
+        Testing the function combine_hourly. It compares the output function
+        with the expected simulated data given below.
         """
+        # expected data given the transformations above.
         expected_data = {
             "times": ["2011-01-01 13:00:00",
                       "2011-01-01 13:00:00",

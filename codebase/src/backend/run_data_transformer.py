@@ -159,7 +159,5 @@ class DataWrangler:
         df_merged.to_csv(f"{directory}/tidy_daily_all_data.csv", index = False)
         print("tidied the data for ", directory)
 
-
-
 datawrangler = DataWrangler()
 datawrangler.downsample()

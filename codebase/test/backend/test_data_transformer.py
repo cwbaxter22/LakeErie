@@ -1,5 +1,7 @@
 """
-Docstring
+This file contains the unit tests for the DataTransformer class.
+It creates test files in the testdata directory and tests the 
+functions in the DataTransformer class.
 """
 
 import os
@@ -20,7 +22,6 @@ class TestDataTransformer(unittest.TestCase):
     2) tidy_data_transform
     3) downsample_hour
     4) downsample_day
-
     """
 
     def setUp(self) -> None:
@@ -73,7 +74,6 @@ class TestDataTransformer(unittest.TestCase):
                     └── ODO.csv
         
         We do this to create all of the files that we would have in the real directory.
-
         """
         self.devices = ["TREC_Tower", "Beach2_Buoy"]
         self.project = ["new", "old", "ichart"]
@@ -96,7 +96,6 @@ class TestDataTransformer(unittest.TestCase):
     def tearDown(self) -> None:
         """
         This function calls wipe_test_data which will delete the test directory created in setUp
-        
         """
         self.wipe_test_data()
 
@@ -132,7 +131,6 @@ class TestDataTransformer(unittest.TestCase):
         """
         Creates a test CSV file with the following columns:
         times, parameter1, parameter2, parameter3
-
         We can then use this to test the across_parameter_aggregate function.
         """
 
@@ -157,10 +155,8 @@ class TestDataTransformer(unittest.TestCase):
         """
         Creates a test CSV file with the following columns:
         times, ODO, Units, Air_Temperature
-
         This dataframe is the result of the across_parameter_aggregate function.
         We use this to test the tidy_data_transform function.
-
         """
         data = {
             "times": ["1/1/2018 13:10",
@@ -182,11 +178,8 @@ class TestDataTransformer(unittest.TestCase):
         """
         Creates a test CSV file with the following columns:
         times, Units, parameter, value
-
         This dataframe is the output of the tidy_data_transform function.
-
         We use this to test the downsample_hour and downsample_day functions.
-        
         """
         data = {
             "times": ["1/1/2018 13:10",
@@ -215,7 +208,6 @@ class TestDataTransformer(unittest.TestCase):
         This function tests that the across_parameter_aggregate function in the DataTransformer
         class correctly merges the csv files in the raw directory and writes the result to the 
         processed directory.
-
         """
 
 

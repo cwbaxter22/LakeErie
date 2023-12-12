@@ -13,7 +13,8 @@ from config_combine import COMBINE_MAP
 
 class DataCombiner():
     """
-    
+    This class is used to combine the data from all 3 sources (iChart, Old, New)
+    into a single combined dataset.
     """
 
     def __init__(self):
@@ -28,41 +29,36 @@ class DataCombiner():
         Set the path to the data directory.
 
         Parameters
-        ----------
-        path : str
-            The path to the data directory.
+        path : str (the path to the data directory).
         """
         self.dir = path
- 
+
     def set_map(self, map: dict = COMBINE_MAP):
         """
         Set the map to the data directory.
 
         Parameters
-        ----------
-        map : dict
-            The map to the data directory.
+        map : dict (the map to the data directory).
         """
         self.map = map
 
     def combine_daily(self):
         """
         Combine the data from all 3 sources (iChart, Old, New) into a single combined dataset.
+        It will combine all the daily data from the 3 sources into a single csv file.
         """
 
         # Run for daily data
         for name, all_device in self.map.items():
             combined_df = []
             for proj, prod_device in zip(["ichart", "old", "new"], all_device):
-                # Skip in  
+                # Skip in 
                 if prod_device is None:
                     continue
                 if proj == "ichart":
                     path = f"{self.dir}/{proj}/{prod_device}/tidy_daily_all_data.csv"
-                    #path = f"../../data/processed/{proj}/{prod_device}/tidy_daily_all_data.csv"
                 else:
                     path = f"{self.dir}/{proj}/{prod_device}/tidy_daily_all_data.csv"
-                    #path = f"../../data/processed/{proj}/{prod_device}/tidy_daily_all_data.csv"
                 if not os.path.exists(path):
                     raise FileNotFoundError(f"Path {path} does not exist.")
 
@@ -107,6 +103,7 @@ class DataCombiner():
     def combine_hourly(self):
         """
         Combine the data from all 3 sources (iChart, Old, New) into a single combined dataset.
+        It will combine all the hourly data from the 3 sources into a single csv file.
         """
 
         # Run for hourly data
