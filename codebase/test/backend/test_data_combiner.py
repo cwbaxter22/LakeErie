@@ -48,7 +48,7 @@ class TestDataCombiner(unittest.TestCase):
         self.devices = ["TREC_Tower"]
         self.projects = ["new", "old", "ichart"]
         #sys.path.append("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/ichart") # Git Actions Running
-        self.processed_path = "/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/ichart"
+        self.processed_path = "/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/processed"
 
         #check to see if the data directory exists and create it if it does not
         if not os.path.exists(self.processed_path):
