@@ -32,7 +32,8 @@ import sys
 # config_combine_mod = importlib.util.module_from_spec(spec2)
 # spec2.loader.exec_module(config_combine_mod)
 
-sys.path.append("../../src/backend")
+sys.path.append("../../src/backend") # Local Running
+sys.path.append("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../../src/backend") # Git Actions Running
 from run_data_loader import (
     START_YEAR,
     CURRENT_YEAR,

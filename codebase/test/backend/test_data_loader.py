@@ -7,7 +7,8 @@ import sys
 import pathlib
 import importlib
 
-sys.path.append("../../src/backend")
+sys.path.append("../../src/backend") # Local Running
+sys.path.append("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../../src/backend") # Git Actions Running
 from data_loader import DataLoader
 
 # codebase_path = pathlib.Path(__file__).parents[2]
