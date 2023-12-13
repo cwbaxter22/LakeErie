@@ -49,7 +49,7 @@ class TestRunDataTransformer(unittest.TestCase):
         self.raw_path = "/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw"
         #self.raw_path = "../testdata/raw"
         self.processed_path = "/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/processed"
-        self.processed_path = "../testdata/processed"
+        #self.processed_path = "../testdata/processed"
         self.data_wrangler.set_path(self.raw_path, self.processed_path)
 
         if not os.path.exists(self.raw_path):
