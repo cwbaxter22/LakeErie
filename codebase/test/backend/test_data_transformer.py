@@ -245,6 +245,8 @@ class TestDataTransformer(unittest.TestCase):
                 self.assertTrue(os.path.exists(os.path.join(path, "all_data.csv")))
                 df = pd.read_csv(os.path.join(path, "all_data.csv"))
                 self.assertListEqual(list(df.columns), expected_columns)
+                print(df)
+                print(expected_data)
                 self.assertTrue(df.equals(expected_data), "dataframes are not equal")
 
 
