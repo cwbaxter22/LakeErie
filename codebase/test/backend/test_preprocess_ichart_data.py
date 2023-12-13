@@ -1,5 +1,5 @@
 """
-This testing class tests the functions in the run_data_transformer.py file.
+This testing class tests the function in the preprocess_ichart_data.py file.
 Specifically, it sets up a testing directory with test csv files and
 tests the downsample function. 
 """
@@ -9,6 +9,7 @@ import os
 import unittest
 import pathlib
 import importlib
+import sys
 
 import numpy as np
 import pandas as pd
@@ -28,9 +29,9 @@ spec.loader.exec_module(old_data_transformer_mod)
 
 class TestPreprocessIchartData(unittest.TestCase):
     """
-    This testing class tests the functions in the run_data_transformer.py file.
+    This testing class tests the functions in the preprocess_ichart_data.py file.
     Specifically, it sets up a testing directory with test csv files and
-    tests the combine_daily and combine_hourly functions.
+    tests the format_pivot function.
     """
 
     def setUp(self) -> None:
@@ -40,29 +41,32 @@ class TestPreprocessIchartData(unittest.TestCase):
         self.oldtransformer = old_data_transformer_mod.OldDataTransformer
         self.projects = ["ichart"]
         self.devices = ["TREC_Tower"]
-        self.raw_path = "../testdata/raw/ichart"
-        self.processed_path = "../testdata/processed"
+        #sys.path.append("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/ichart") # Git Actions Running
+        self.raw_path = "/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/ichart"
+        #self.raw_path = "../testdata/raw/ichart"
+        self.processed_path = "/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/processed"
+        #self.processed_path = "../testdata/processed"
         self.oldtransformer.set_path(self.raw_path, self.processed_path)
 
-        if not os.path.exists("../testdata/raw"):
-            os.mkdir("../testdata/raw")
+        if not os.path.exists("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw"):
+            os.mkdir("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw")
 
         for project in self.projects:
-            if not os.path.exists(f"../testdata/raw/{project}"):
-                os.mkdir(f"../testdata/raw/{project}")
+            if not os.path.exists(f"/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/{project}"):
+                os.mkdir(f"/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/{project}")
 
             # check to see if the processed directory exists
-            if not os.path.exists(f"../testdata/raw/{project}/by_parameter"):
-                os.mkdir(f"../testdata/raw/{project}/by_parameter")
+            if not os.path.exists(f"/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/{project}/by_parameter"):
+                os.mkdir(f"/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/{project}/by_parameter")
 
-            if not os.path.exists(f"../testdata/raw/{project}/pivot"):
-                os.mkdir(f"../testdata/raw/{project}/pivot")
+            if not os.path.exists(f"/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/{project}/pivot"):
+                os.mkdir(f"/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/{project}/pivot")
             
             for device in self.devices:
-                if not os.path.exists(f"../testdata/raw/{project}/by_parameter/{device}"):
-                    os.mkdir(f"../testdata/raw/{project}/by_parameter/{device}")
-                if not os.path.exists(f"../testdata/raw/{project}/pivot/{device}"):
-                    os.mkdir(f"../testdata/raw/{project}/pivot/{device}")
+                if not os.path.exists(f"/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/{project}/by_parameter/{device}"):
+                    os.mkdir(f"/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/{project}/by_parameter/{device}")
+                if not os.path.exists(f"/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/{project}/pivot/{device}"):
+                    os.mkdir(f"/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/{project}/pivot/{device}")
 
         # create a test csv file for tidy_all_data
         self.create_raw_test_csv()
@@ -87,7 +91,7 @@ class TestPreprocessIchartData(unittest.TestCase):
 
     def create_raw_test_csv(self):
         """
-        Create a test csv file to be used for testing the run_data_transformer.py file.
+        Create a test csv file to be used for testing the preprocess_ichart_data.py file.
         
         """
         # create a test csv file for tidy_all_data
@@ -106,7 +110,7 @@ class TestPreprocessIchartData(unittest.TestCase):
     def test_format_pivot(self):
         
         """
-        This function tests the downsample function. It compares the 
+        This function tests the format_pivot. It compares the 
         output function with the expected simulated data given below. 
         """
         # expected data given the transformations above.
@@ -119,7 +123,7 @@ class TestPreprocessIchartData(unittest.TestCase):
         expected_daily_data = pd.DataFrame(expected_daily_data)
 
         self.oldtransformer.format_pivot("TREC_Tower", "AirTemp_F")
-        path = "../testdata/raw/ichart/pivot/TREC_Tower"
+        path = "/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/ichart/pivot/TREC_Tower"
         self.assertTrue(os.path.exists(os.path.join(path, "AirTemp_pivot.csv")))
         df = pd.read_csv(os.path.join(path, "AirTemp_pivot.csv"))
         self.assertTrue(df["times"].equals(expected_daily_data["times"]),
