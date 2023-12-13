@@ -14,7 +14,7 @@ Technology Review Presentation Available here:
 https://docs.google.com/presentation/d/1Gqygo2uVCjlTfW1YYUflClmrQNrQyhChPKJihoyyjBY/edit?usp=sharing
 
 # Project Layout:
-![Alt text](image-6.png)
+![Alt text](Docs/image-6.png)
 
 # Data 
 
