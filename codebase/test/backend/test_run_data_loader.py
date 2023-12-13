@@ -10,30 +10,30 @@ import pathlib
 import importlib
 import sys
 
-codebase_path = pathlib.Path(__file__).parents[2]
-#https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
-# Run data loader
-spec = importlib.util.spec_from_file_location(
-    name='run_data_loader_mod',  # name is not related to the file, it's the module name!
-    location= str(codebase_path) +
-    "//src//backend//run_data_loader.py"  # full path to the script
-)
+# codebase_path = pathlib.Path(__file__).parents[2]
+# #https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
+# # Run data loader
+# spec = importlib.util.spec_from_file_location(
+#     name='run_data_loader_mod',  # name is not related to the file, it's the module name!
+#     location= str(codebase_path) +
+#     "//src//backend//run_data_loader.py"  # full path to the script
+# )
 
-run_data_loader_mod = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(run_data_loader_mod)
+# run_data_loader_mod = importlib.util.module_from_spec(spec)
+# spec.loader.exec_module(run_data_loader_mod)
 
-# Config
-spec2 = importlib.util.spec_from_file_location(
-    name='config_combine_mod',  # name is not related to the file, it's the module name!
-    location= str(codebase_path) +
-    "//src//backend//config_combine.py"  # full path to the script
-)
+# # Config
+# spec2 = importlib.util.spec_from_file_location(
+#     name='config_combine_mod',  # name is not related to the file, it's the module name!
+#     location= str(codebase_path) +
+#     "//src//backend//config_combine.py"  # full path to the script
+# )
 
-config_combine_mod = importlib.util.module_from_spec(spec2)
-spec2.loader.exec_module(config_combine_mod)
+# config_combine_mod = importlib.util.module_from_spec(spec2)
+# spec2.loader.exec_module(config_combine_mod)
 
 sys.path.append("../../src/backend")
-from run_data_loader_mod import (
+from run_data_loader import (
     START_YEAR,
     CURRENT_YEAR,
     get_times,
