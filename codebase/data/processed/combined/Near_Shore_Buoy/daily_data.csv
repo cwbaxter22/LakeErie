@@ -2571,7 +2571,6 @@ times,Units,value_mean,value_std,parameter,location
 2014-11-11,mg/L,11.157638888888888,0.1132737721334818,ODO,Near_Shore_Buoy
 2014-11-12,mg/L,11.21125,0.0936212845871131,ODO,Near_Shore_Buoy
 2014-11-13,mg/L,6.458333333333333,5.458714726522473,ODO,Near_Shore_Buoy
-2014-11-14,mg/L,0.0,0.0,ODO,Near_Shore_Buoy
 2014-11-15,mg/L,,,ODO,Near_Shore_Buoy
 2014-11-16,mg/L,,,ODO,Near_Shore_Buoy
 2014-11-17,mg/L,,,ODO,Near_Shore_Buoy
@@ -3991,7 +3990,6 @@ times,Units,value_mean,value_std,parameter,location
 2018-10-01,mg/L,4.409280575539569,4.40400707621345,ODO,Near_Shore_Buoy
 2018-10-02,mg/L,,,ODO,Near_Shore_Buoy
 2018-10-03,mg/L,,,ODO,Near_Shore_Buoy
-2018-10-04,mg/L,0.0,0.0,ODO,Near_Shore_Buoy
 2018-10-05,mg/L,,,ODO,Near_Shore_Buoy
 2018-10-06,mg/L,,,ODO,Near_Shore_Buoy
 2018-10-07,mg/L,,,ODO,Near_Shore_Buoy

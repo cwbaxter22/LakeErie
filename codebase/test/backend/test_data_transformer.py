@@ -1,17 +1,20 @@
 """
-Docstring
+This file contains the unit tests for the DataTransformer class.
+It creates test files in the testdata directory and tests the 
+functions in the DataTransformer class.
 """
 
 import os
-import sys
 import unittest
+import importlib
+import pathlib
+import sys
 
 import numpy as np
 import pandas as pd
 
-sys.path.append("../../src/backend")
-from data_transformer import DataTransformer
-
+sys.path.append("../../src/backend") # Local Running
+sys.path.append("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../../src/backend") # Git Actions Running
 
 class TestDataTransformer(unittest.TestCase):
     """
@@ -20,7 +23,6 @@ class TestDataTransformer(unittest.TestCase):
     2) tidy_data_transform
     3) downsample_hour
     4) downsample_day
-
     """
 
     def setUp(self) -> None:
@@ -42,7 +44,7 @@ class TestDataTransformer(unittest.TestCase):
         │   │   └── TREC_Tower
         │   │       ├── Air_Temperature.csv
         │   │       └── ODO.csv
-        │   └── iChart
+        │   └── ichart
         │       ├── Beach2_Buoy
         │       │   ├── Air_Temperature.csv
         │       │   └── ODO.csv
@@ -64,7 +66,7 @@ class TestDataTransformer(unittest.TestCase):
             │   └── TREC_Tower
             │       ├── Air_Temperature.csv
             │       └── ODO.csv
-            └── iChart
+            └── ichart
                 ├── Beach2_Buoy
                 │   ├── Air_Temperature.csv
                 │   └── ODO.csv
@@ -73,11 +75,21 @@ class TestDataTransformer(unittest.TestCase):
                     └── ODO.csv
         
         We do this to create all of the files that we would have in the real directory.
-
         """
+        codebase_path = pathlib.Path(__file__).parents[2]
+        #https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
+        spec = importlib.util.spec_from_file_location(
+            name='data_transformer_mod',  # name is not related to the file, it's the module name!
+            location= str(codebase_path) +
+            "//src//backend//data_transformer.py"  # full path to the script
+        )
+
+        data_transformer_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(data_transformer_mod)
         self.devices = ["TREC_Tower", "Beach2_Buoy"]
-        self.project = ["new", "old", "iChart"]
-        self.data_transformer = DataTransformer()
+        self.project = ["new", "old", "ichart"]
+        #self.data_transformer = DataTransformer()
+        self.data_transformer = data_transformer_mod.DataTransformer()
         for project in self.project:
             if not os.path.exists(f"../testdata/raw/{project}"):
                 os.makedirs(f"../testdata/raw/{project}")
@@ -96,7 +108,6 @@ class TestDataTransformer(unittest.TestCase):
     def tearDown(self) -> None:
         """
         This function calls wipe_test_data which will delete the test directory created in setUp
-        
         """
         self.wipe_test_data()
 
@@ -111,14 +122,14 @@ class TestDataTransformer(unittest.TestCase):
             "../testdata/raw/new/Beach2_Buoy",
             "../testdata/raw/old/TREC_Tower",
             "../testdata/raw/old/Beach2_Buoy",
-            "../testdata/raw/iChart/TREC_Tower",
-            "../testdata/raw/iChart/Beach2_Buoy",
+            "../testdata/raw/ichart/TREC_Tower",
+            "../testdata/raw/ichart/Beach2_Buoy",
             "../testdata/processed/new/TREC_Tower",
             "../testdata/processed/new/Beach2_Buoy",
             "../testdata/processed/old/TREC_Tower",
             "../testdata/processed/old/Beach2_Buoy",
-            "../testdata/processed/iChart/TREC_Tower",
-            "../testdata/processed/iChart/Beach2_Buoy"
+            "../testdata/processed/ichart/TREC_Tower",
+            "../testdata/processed/ichart/Beach2_Buoy"
             ]
         for directory in directories:
             for filename in os.listdir(directory):
@@ -132,7 +143,6 @@ class TestDataTransformer(unittest.TestCase):
         """
         Creates a test CSV file with the following columns:
         times, parameter1, parameter2, parameter3
-
         We can then use this to test the across_parameter_aggregate function.
         """
 
@@ -157,10 +167,8 @@ class TestDataTransformer(unittest.TestCase):
         """
         Creates a test CSV file with the following columns:
         times, ODO, Units, Air_Temperature
-
         This dataframe is the result of the across_parameter_aggregate function.
         We use this to test the tidy_data_transform function.
-
         """
         data = {
             "times": ["1/1/2018 13:10",
@@ -182,11 +190,8 @@ class TestDataTransformer(unittest.TestCase):
         """
         Creates a test CSV file with the following columns:
         times, Units, parameter, value
-
         This dataframe is the output of the tidy_data_transform function.
-
         We use this to test the downsample_hour and downsample_day functions.
-        
         """
         data = {
             "times": ["1/1/2018 13:10",
@@ -215,11 +220,10 @@ class TestDataTransformer(unittest.TestCase):
         This function tests that the across_parameter_aggregate function in the DataTransformer
         class correctly merges the csv files in the raw directory and writes the result to the 
         processed directory.
-
         """
 
 
-        expected_columns = ['times', 'ODO', 'Units', 'Air_Temperature']
+        expected_columns = ['times', 'Air_Temperature', 'Units', 'ODO']
         expected_data = {
             "times": ["1/1/2018 13:10",
                       "1/1/2018 13:20",
@@ -227,9 +231,9 @@ class TestDataTransformer(unittest.TestCase):
                       "1/1/2018 13:10",
                       "1/1/2018 13:20",
                       "1/1/2018 13:30"],
-            "ODO": [10.1, 9.2, 10.4, np.nan, np.nan, np.nan],
-            "Units": ["mg/L", "mg/L", "mg/L", "F", "F", "F"],
-            "Air_Temperature": [np.nan, np.nan, np.nan, 42.1, 42.9, 42.2],
+            "Air_Temperature": [42.1, 42.9, 42.2, np.nan, np.nan, np.nan],
+            "Units": ["F", "F", "F", "mg/L", "mg/L", "mg/L"],
+            "ODO": [np.nan, np.nan, np.nan, 10.1, 9.2, 10.4]
         }
         expected_data["times"] = pd.Series(expected_data["times"])
         expected_data = pd.DataFrame(expected_data)
@@ -241,6 +245,8 @@ class TestDataTransformer(unittest.TestCase):
                 self.assertTrue(os.path.exists(os.path.join(path, "all_data.csv")))
                 df = pd.read_csv(os.path.join(path, "all_data.csv"))
                 self.assertListEqual(list(df.columns), expected_columns)
+                print(df)
+                print(expected_data)
                 self.assertTrue(df.equals(expected_data), "dataframes are not equal")
 
 

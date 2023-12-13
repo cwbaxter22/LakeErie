@@ -1,14 +1,39 @@
 """
 This is the testing script for the run_data_loader.py file. The run_data_loader files uses the
 DataLoader class to call the WQData API and save the data to the raw data directory from multiple
-project sources (old and new). Note that run_data_loader has significant logic to handle the constraints
+project sources (old and new). Note that run_data_loader has significant logic to handle the constraints.
 of the WQData API (e.g. hourly limit, data limit, etc.). 
 """
 from unittest.mock import patch, MagicMock
 import unittest
+import pathlib
+import importlib
 import sys
 
-sys.path.append("../../src/backend")
+# codebase_path = pathlib.Path(__file__).parents[2]
+# #https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
+# # Run data loader
+# spec = importlib.util.spec_from_file_location(
+#     name='run_data_loader_mod',  # name is not related to the file, it's the module name!
+#     location= str(codebase_path) +
+#     "//src//backend//run_data_loader.py"  # full path to the script
+# )
+
+# run_data_loader_mod = importlib.util.module_from_spec(spec)
+# spec.loader.exec_module(run_data_loader_mod)
+
+# # Config
+# spec2 = importlib.util.spec_from_file_location(
+#     name='config_combine_mod',  # name is not related to the file, it's the module name!
+#     location= str(codebase_path) +
+#     "//src//backend//config_combine.py"  # full path to the script
+# )
+
+# config_combine_mod = importlib.util.module_from_spec(spec2)
+# spec2.loader.exec_module(config_combine_mod)
+
+sys.path.append("../../src/backend") # Local Running
+sys.path.append("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../../src/backend") # Git Actions Running
 from run_data_loader import (
     START_YEAR,
     CURRENT_YEAR,
@@ -16,8 +41,8 @@ from run_data_loader import (
     aggregate_data,
     ping_api,
 )
-from config import OLD_API_KEY, NEW_API_KEY
 
+# from config import OLD_API_KEY, NEW_API_KEY
 
 class TestRunnerDataLoader(unittest.TestCase):
     """

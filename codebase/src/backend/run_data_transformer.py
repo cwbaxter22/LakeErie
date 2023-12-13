@@ -3,8 +3,6 @@ The purpose of this file is to run the data_transformer.py file for all devices 
 We found that in practice, the files we generated from the "new" and "old" projects (the
 data that we downloaded using data_loader.py) were too large to run on our local machines. 
 Therefore, we decided to run a downsample function first on the data to try and pair it down.
-As it turned out, 2 of the data sets were too large to run on the local machine. Stay tuned 
-for the solution we find.
 
 This file will run the data_transformer program for ichart data since all of those files were 
 small enough to run on our local machines. 
@@ -15,21 +13,34 @@ Due to the large file size, we will only run this program once in order to gener
 data. 
 """
 import os
+import importlib
+import pathlib
 
 import pandas as pd
 
-from data_transformer import DataTransformer
+codebase_path = pathlib.Path(__file__).parents[2]
+#https://stackoverflow.com/questions/65206129/importlib-not-utilising-recognising-path
+spec = importlib.util.spec_from_file_location(
+    name='data_transformer_mod',  # name is not related to the file, it's the module name!
+    location= str(codebase_path) +
+    "//src//backend//data_transformer.py"  # full path to the script
+    )
+
+data_transformer_mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(data_transformer_mod)
+
+#from data_transformer import DataTransformer
 
 
-# uncomment this section to run the data_transformer.py file for ichart data
-# ichart
-dataTransformer = DataTransformer()
-dataTransformer.set_path("../../data/raw/ichart/pivot")
-dataTransformer.set_devices(["Beach2_Tower", "Beach2_Buoy", "Beach6_Buoy", "TREC_Tower"])
-dataTransformer.device_aggregate("ichart")
-dataTransformer.tidy_devices("ichart")
-dataTransformer.device_downsample_hour("ichart")
-dataTransformer.device_downsample_day("ichart")
+# # uncomment this section to run the data_transformer.py file for ichart data
+# # ichart
+# dataTransformer = data_transformer_mod.DataTransformer()
+# dataTransformer.set_path("../../data/raw/ichart/pivot")
+# dataTransformer.set_devices(["Beach2_Tower", "Beach2_Buoy", "Beach6_Buoy", "TREC_Tower"])
+# dataTransformer.device_aggregate("ichart")
+# dataTransformer.tidy_devices("ichart")
+# dataTransformer.device_downsample_hour("ichart")
+# dataTransformer.device_downsample_day("ichart")
 
 
 
@@ -49,8 +60,27 @@ class DataWrangler:
     """
     def __init__(self) -> None:
         # the project names (also built into the file directory system)
-        self.project = [ "new", "old"]
+        self.project = []
+        self.processed_path = ""
+        self.raw_path = ""
 
+    def set_project(self, project: list = ["new", "old"]) -> None:
+        """
+        This function sets the project names. 
+        """
+        self.project = project
+
+    def set_path(self,
+                 raw_path: str = "../../data/raw",
+                 processed_path: str = "../../data/processed"
+                 ) -> None:
+        """
+        This function sets the path for the raw and processed data.
+        The defaults are set to the expected path for the data on the user's computer, 
+        given the user correctly downloaded/cloned the repository.
+        """
+        self.raw_path = raw_path
+        self.processed_path = processed_path
 
     def downsample(self) -> None:
         """
@@ -72,11 +102,11 @@ class DataWrangler:
         """
         # iterates through the old and new project directories.
         for project in self.project:
-            for device in os.listdir(f"../../data/raw/{project}"):
-                for filename in os.listdir(f"../../data/raw/{project}/{device}"):
+            for device in os.listdir(f"{self.raw_path}/{project}"):
+                for filename in os.listdir(f"{self.raw_path}/{project}/{device}"):
                     print("Downsampling: ", device, filename)
                     if filename.endswith(".csv"):
-                        df = pd.read_csv(f"../../data/raw/{project}/{device}/{filename}")
+                        df = pd.read_csv(f"{self.raw_path}/{project}/{device}/{filename}")
                         # removing any extra headers that happened to get appended
                         # to the raw datafile (specifically any file for TREC_Tower)
                         df = df[df["times"] != "times"]
@@ -126,11 +156,11 @@ class DataWrangler:
                         daily_df["parameter"] = parameter
 
                         #save the data to a csv file
-                        path = f"../../data/processed/{project}/{device}"
+                        path = f"{self.processed_path}/{project}/{device}"
                         hourly_df.to_csv(os.path.join(path, f"hourly_{filename}"), index = False)
                         daily_df.to_csv(os.path.join(path, f"daily_{filename}"), index = False)
 
-                self.parser(f"../../data/processed/{project}/{device}")
+                self.parser(f"{self.processed_path}/{project}/{device}")
 
 
 
@@ -153,13 +183,12 @@ class DataWrangler:
         for filename in os.listdir(directory):
             if filename.endswith(".csv"):
                 if filename.startswith("daily"):
-                    print("location2:", filename)
                     df = pd.read_csv(f"{directory}/{filename}")
                     df_merged = pd.concat([df_merged, df], ignore_index=True)
         df_merged.to_csv(f"{directory}/tidy_daily_all_data.csv", index = False)
         print("tidied the data for ", directory)
 
 
-
 datawrangler = DataWrangler()
+datawrangler.set_path()
 datawrangler.downsample()

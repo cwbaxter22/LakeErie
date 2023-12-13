@@ -7,8 +7,8 @@ WQData also transitioned to new dataloggers in 2016, so another challenge is the
 each with their own API key. 
 
 To do this we run aggregate_data() twice: 
-1. Execute Aggregate Data with API key set to old
-2. Execute Aggregate Data with API key set to new
+1. Execute Aggregate Data with API key set to old.
+2. Execute Aggregate Data with API key set to new.
 
 Ideally this script only needs to be run once to get all of the data.
 
@@ -21,7 +21,8 @@ import datetime
 import pandas as pd
 import numpy as np
 
-from config import OLD_API_KEY, NEW_API_KEY
+# from config import OLD_API_KEY, NEW_API_KEY
+OLD_API_KEY, NEW_API_KEY = 100, 200
 from data_loader import DataLoader
 
 # CREATE GLOBAL TIME CONSTANTS

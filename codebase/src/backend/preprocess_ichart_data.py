@@ -1,5 +1,11 @@
 """
-Docstring here.
+This class is used to transform the downloaded iChart data to a raw format
+that can be used with the data_transformer function and subsequent data
+processing and cleaning functions. Due to the nature of the iChart data
+this function was meant to be run once by the dev team, and then the
+processed raw data will be available to users. Otherwise, the user would
+need to jump through a ton of hoops to get the data into a csv file that 
+could be read.
 """
 
 import os
@@ -16,23 +22,40 @@ class OldDataTransformer():
     processed raw data will be available to users. Otherwise, the user would
     need to jump through a ton of hoops to get the data into a csv file that 
     could be read.
-
     """
 
     def __init__(self) -> None:
+        # hardcoded device names for the iChart data.
         self.device_id = ["TREC_Tower", "Beach6_Buoy", "Beach2_Tower", "Beach2_Buoy"]
+        self.raw_path = ""
+        self.processed_path = ""
 
-
-
-    def transform(self, device) -> None:
+    def set_path(self,
+                 raw_path: str = "../../data/raw",
+                 processed_path: str = "../../data/processed"
+                 ) -> None:
         """
-        This function 
+        This function sets the path for the raw and processed data.
+        The defaults are set to the expected path for the data on the user's computer, 
+        given the user correctly downloaded/cloned the repository.
+        """
+        
+        self.raw_path = raw_path
+        self.processed_path = processed_path
+
+
+
+    def transform(self, device: str) -> None:
+        """
+        This function transforms the iChart data into a raw format that can be
+        used with the data_transformer function and subsequent data processing
+        and cleaning functions. 
 
         Arguments:
-        
+        device(str) -- the device name that is being transformed.
         
         Returns:
-        
+        no returns, but creates a csv file for each device
         
         Raises:
         -------
@@ -41,10 +64,10 @@ class OldDataTransformer():
         df = pd.DataFrame()
         dfs = []
 
-        for filename in os.listdir(f"../data/iChart6_data/raw/{device}"):
+        for filename in os.listdir(f"{self.raw_path}/{device}"):
             if filename.endswith(".csv"):
-                path = "../data/iChart6_data/raw"
-                df = pd.read_csv(os.path.join(path, device, filename), encoding='latin-1')
+                
+                df = pd.read_csv(os.path.join(self.raw_path, device, filename), encoding='latin-1')
 
                 # standardizing column names for use
                 new_columns = df.iloc[1] + "_" + df.iloc[2].fillna("")
@@ -75,14 +98,14 @@ class OldDataTransformer():
 
             # changing the parameter name so we could use it in the filename.
             parameter = parameter.replace("/", "%per%")
-            filepath = f"../data/iChart6_data/raw/by_parameter/{device}/{parameter}.csv"
+            filepath = f"{self.raw_path}/by_parameter/{device}/{parameter}.csv"
             try:
                 df.to_csv(filepath, index=False)
                 print(f"File '{device}_{parameter}.csv' successfully saved.")
             except Exception as e:
                 print(f"Error saving file '{device}_{parameter}.csv': {e}")
 
-        merged_df.to_csv(f"../data/iChart6_data/processed/{device}_all_data.csv", index=False)
+        merged_df.to_csv(f"{self.processed_path}/{device}_all_data.csv", index=False)
 
 
     def device_transform(self) -> None:
@@ -95,11 +118,11 @@ class OldDataTransformer():
 
     def format_pivot(self,device: str, parameter_id: str) -> None:
         """
-        Doc String goes here
-
         This function is used to format the data into pivot table format
+        so that it can be used with the data_transformer function and subsequent
+        data processing and cleaning functions.
         """
-        path = f"../data/iChart6_data/raw/by_parameter/{device}/{parameter_id}"
+        path = f"{self.raw_path}/by_parameter/{device}/{parameter_id}.csv"
         df = pd.read_csv(path , encoding='latin-1')
         df['times'] = df['times'].drop_duplicates()
         df.drop_duplicates("times", inplace=True)
@@ -117,7 +140,7 @@ class OldDataTransformer():
             parameter_column = df.columns[0]
             df = df.rename(columns={parameter_column: f"{column_name_parts[0][0]}"})
 
-            pivot_path = f"../data/iChart6_data/raw/pivot/{device}"
+            pivot_path = f"{self.raw_path}/pivot/{device}"
             df.to_csv(os.path.join(pivot_path, f"{column_name_parts[0][0]}_pivot.csv"))
         except Exception as e:
             print(f"Error saving file '{device}_{parameter_id}.csv': {e}")
@@ -129,11 +152,11 @@ class OldDataTransformer():
         Iterates through all the devices.
         """
         for device in self.device_id:
-            for filename in os.listdir(f"../data/iChart6_data/raw/by_parameter/{device}"):
+            for filename in os.listdir(f"{self.raw_path}/by_parameter/{device}"):
                 if filename.endswith(".csv"):
                     self.format_pivot(device, filename)
 
 
 OldDataTransformer = OldDataTransformer()
-OldDataTransformer.device_transform()
-OldDataTransformer.pivot_devices()
+# OldDataTransformer.device_transform()
+# OldDataTransformer.pivot_devices()
