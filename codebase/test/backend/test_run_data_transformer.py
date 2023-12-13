@@ -9,6 +9,7 @@ import os
 import unittest
 import pathlib
 import importlib
+import sys
 
 import numpy as np
 import pandas as pd
@@ -24,6 +25,9 @@ spec = importlib.util.spec_from_file_location(
 
 data_wrangler_mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(data_wrangler_mod)
+
+sys.path.append("../../src/backend") # Local Running
+sys.path.append("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../../src/backend") # Git Actions Running
 
 
 

@@ -8,9 +8,13 @@ import os
 import unittest
 import importlib
 import pathlib
+import sys
 
 import numpy as np
 import pandas as pd
+
+sys.path.append("../../src/backend") # Local Running
+sys.path.append("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../../src/backend") # Git Actions Running
 
 class TestDataTransformer(unittest.TestCase):
     """
