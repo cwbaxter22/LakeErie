@@ -47,27 +47,28 @@ class TestDataCombiner(unittest.TestCase):
         self.data_combiner = data_combiner_mod.DataCombiner()
         self.devices = ["TREC_Tower"]
         self.projects = ["new", "old", "ichart"]
-
+        #sys.path.append("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/ichart") # Git Actions Running
+        self.processed_path = "/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/ichart"
 
         #check to see if the data directory exists and create it if it does not
-        if not os.path.exists("../testdata/processed"):
-            os.mkdir("../testdata/processed")
-        if not os.path.exists("../testdata/processed/combined"):
-            os.mkdir("../testdata/processed/combined")
+        if not os.path.exists(self.processed_path):
+            os.mkdir(self.processed_path)
+        if not os.path.exists(f"{self.processed_path}/combined"):
+            os.mkdir(f"{self.processed_path}/combined")
 
         for project in self.projects:
-            if not os.path.exists(f"../testdata/processed/{project}"):
-                os.mkdir(f"../testdata/processed/{project}")
+            if not os.path.exists(f"{self.processed_path}/{project}"):
+                os.mkdir(f"{self.processed_path}/{project}")
 
             # check to see if the processed directory exists
             for device in self.devices:
-                if not os.path.exists(f"../testdata/processed/{project}/{device}"):
-                    os.mkdir(f"../testdata/processed/{project}/{device}")
+                if not os.path.exists(f"{self.processed_path}/{project}/{device}"):
+                    os.mkdir(f"{self.processed_path}/{project}/{device}")
 
-                if not os.path.exists(f"../testdata/processed/combined/{device}"):
-                    os.mkdir(f"../testdata/processed/combined/{device}")
+                if not os.path.exists(f"{self.processed_path}/combined/{device}"):
+                    os.mkdir(f"{self.processed_path}/combined/{device}")
 
-        self.data_combiner.set_path("../testdata/processed")
+        self.data_combiner.set_path(self.processed_path)
         self.create_processed_test_csv("ichart", "2011")
         self.create_processed_test_csv("old", "2018")
         self.create_processed_test_csv("new", "2022")
@@ -79,7 +80,7 @@ class TestDataCombiner(unittest.TestCase):
         """
         for project in self.projects:
             for device in self.devices:
-                path = "../testdata/processed"
+                path = self.processed_path
                 if os.path.exists(f"{path}/{project}/{device}/tidy_daily_all_data.csv"):
                     os.remove(f"{path}/{project}/{device}/tidy_daily_all_data.csv")
                 if os.path.exists(f"{path}/{project}/{device}/tidy_hourly_all_data.csv"):
@@ -119,7 +120,7 @@ class TestDataCombiner(unittest.TestCase):
             expected_daily_data["times"] = pd.to_datetime(expected_daily_data["times"])
             expected_daily_data["times"] = pd.Series(expected_daily_data["times"])
             expected_daily_data = pd.DataFrame(expected_daily_data)
-            path = f"../testdata/processed/{project}/{device}"
+            path = f"{self.processed_path}/{project}/{device}"
             expected_daily_data.to_csv(f"{path}/tidy_daily_all_data.csv", index=False)
 
             expected_hourly_data = {
@@ -167,7 +168,7 @@ class TestDataCombiner(unittest.TestCase):
         expected_data = pd.DataFrame(expected_data)
 
         self.data_combiner.combine_daily()
-        path = "../testdata/processed/combined/TREC_Tower"
+        path = f"{self.processed_path}/combined/TREC_Tower"
         self.assertTrue(os.path.exists(os.path.join(path, "daily_data.csv")))
         df = pd.read_csv(os.path.join(path, "daily_data.csv"))
         self.assertTrue(df["times"].equals(expected_data["times"]),
@@ -217,7 +218,7 @@ class TestDataCombiner(unittest.TestCase):
         expected_data = pd.DataFrame(expected_data)
 
         self.data_combiner.combine_hourly()
-        path = "../testdata/processed/combined/TREC_Tower"
+        path = f"{self.processed_path}/combined/TREC_Tower"
         self.assertTrue(os.path.exists(os.path.join(path, "hourly_data.csv")))
         df = pd.read_csv(os.path.join(path, "hourly_data.csv"))
         self.assertTrue(df["times"].equals(expected_data["times"]),

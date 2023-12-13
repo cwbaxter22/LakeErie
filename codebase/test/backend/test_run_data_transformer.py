@@ -26,8 +26,7 @@ spec = importlib.util.spec_from_file_location(
 data_wrangler_mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(data_wrangler_mod)
 
-sys.path.append("../../src/backend") # Local Running
-sys.path.append("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../../src/backend") # Git Actions Running
+
 
 
 
@@ -46,35 +45,38 @@ class TestRunDataTransformer(unittest.TestCase):
         self.projects = ["old"]
         self.devices = ["TREC_Tower"]
         self.data_wrangler.set_project(self.projects)
-        self.raw_path = "../testdata/raw"
+        #sys.path.append("/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw/ichart") # Git Actions Running
+        self.raw_path = "/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/raw"
+        #self.raw_path = "../testdata/raw"
+        self.processed_path = "/home/runner/work/LakeErie/LakeErie/codebase/test/backend/../testdata/processed"
         self.processed_path = "../testdata/processed"
         self.data_wrangler.set_path(self.raw_path, self.processed_path)
 
-        if not os.path.exists("../testdata/raw"):
-            os.mkdir("../testdata/raw")
+        if not os.path.exists(self.raw_path):
+            os.mkdir(self.raw_path)
 
         for project in self.projects:
-            if not os.path.exists(f"../testdata/raw/{project}"):
-                os.mkdir(f"../testdata/raw/{project}")
+            if not os.path.exists(f"{self.raw_path}/{project}"):
+                os.mkdir(f"{self.raw_path}/{project}")
 
             # check to see if the processed directory exists
             for device in self.devices:
-                if not os.path.exists(f"../testdata/raw/{project}/{device}"):
-                    os.mkdir(f"../testdata/raw/{project}/{device}")
+                if not os.path.exists(f"{self.raw_path}/{project}/{device}"):
+                    os.mkdir(f"{self.raw_path}/{project}/{device}")
 
 
         #check to see if the data directory exists and create it if it does not
-        if not os.path.exists("../testdata/processed"):
-            os.mkdir("../testdata/processed")
+        if not os.path.exists(self.processed_path):
+            os.mkdir(self.processed_path)
 
         for project in self.projects:
-            if not os.path.exists(f"../testdata/processed/{project}"):
-                os.mkdir(f"../testdata/processed/{project}")
+            if not os.path.exists(f"{self.processed_path}/{project}"):
+                os.mkdir(f"{self.processed_path}/{project}")
 
             # check to see if the processed directory exists
             for device in self.devices:
-                if not os.path.exists(f"../testdata/processed/{project}/{device}"):
-                    os.mkdir(f"../testdata/processed/{project}/{device}")
+                if not os.path.exists(f"{self.processed_path}/{project}/{device}"):
+                    os.mkdir(f"{self.processed_path}/{project}/{device}")
 
         # create a test csv file for tidy_all_data
         self.create_raw_test_csv()
@@ -131,7 +133,7 @@ class TestRunDataTransformer(unittest.TestCase):
         expected_daily_data = pd.DataFrame(expected_daily_data)
 
         self.data_wrangler.downsample()
-        path = "../testdata/processed/old/TREC_Tower"
+        path = f"{self.processed_path}/old/TREC_Tower"
         self.assertTrue(os.path.exists(os.path.join(path, "tidy_daily_all_data.csv")))
         df = pd.read_csv(os.path.join(path, "tidy_daily_all_data.csv"))
         self.assertTrue(df["times"].equals(expected_daily_data["times"]),
@@ -157,7 +159,7 @@ class TestRunDataTransformer(unittest.TestCase):
         expected_hourly_data = pd.DataFrame(expected_hourly_data)
 
         self.data_wrangler.downsample()
-        path = "../testdata/processed/old/TREC_Tower"
+        path = f"{self.processed_path}/old/TREC_Tower"
         self.assertTrue(os.path.exists(os.path.join(path, "tidy_hourly_all_data.csv")))
         df = pd.read_csv(os.path.join(path, "tidy_hourly_all_data.csv"))
         self.assertTrue(df["times"].equals(expected_hourly_data["times"]),
