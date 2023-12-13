@@ -231,9 +231,9 @@ class TestDataTransformer(unittest.TestCase):
                       "1/1/2018 13:10",
                       "1/1/2018 13:20",
                       "1/1/2018 13:30"],
-            "Air_Temperature": [42.1, 42.9, 42.2, np.nan, np.nan, np.nan],
+            "ODO": [10.1, 9.2, 10.4, np.nan, np.nan, np.nan],
             "Units": ["mg/L", "mg/L", "mg/L", "F", "F", "F"],
-            "ODO": [np.nan, np.nan, np.nan, 10.1, 9.2, 10.4]
+            "Air_Temperature": [np.nan, np.nan, np.nan, 42.1, 42.9, 42.2]
         }
         expected_data["times"] = pd.Series(expected_data["times"])
         expected_data = pd.DataFrame(expected_data)
